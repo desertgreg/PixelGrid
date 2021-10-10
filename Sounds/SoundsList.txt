@@ -1,0 +1,18 @@
+SOUNDS
+
+- PixelgridStartup-X
+- EnterProgram (hit ok)
+- ExitProgram (also hit ok but maybe reverse zooming)
+- MenuLeft
+- MenuRight
+- TestSound
+
+Game
+- NextRoom
+- PickupCoin
+- SwooshSword
+- TakeDamage
+- MonsterHit
+- MonsterAppear
+- BossAppear
+- Win
