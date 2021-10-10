@@ -1,5 +1,5 @@
-#ifndef SYSTEMSOUNDS_H
-#define SYSTEMSOUNDS_H
+#ifndef PGSYSTEMSOUNDS_H
+#define PGSYSTEMSOUNDS_H
 
 #include "PGSounds.h"
 
@@ -16,4 +16,4 @@ extern PGSound SwooshSnd;
 extern PGSound TakeDamageSnd;
 extern PGSound TestSoundSnd;
 
-#endif //SYSTEMSOUNDS_H
+#endif //PGSYSTEMSOUNDS_H
