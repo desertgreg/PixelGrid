@@ -85,7 +85,7 @@ namespace BinaryToSnd
                 con.sbcpp.Append("\r\n\t");
                 foreach (byte b in filedata)
                 {
-                    con.sbcpp.Append("0x" + Convert.ToString(b, 16).PadLeft(2, ' '));
+                    con.sbcpp.Append("0x" + Convert.ToString(b, 16).PadLeft(2, '0'));
 
                     // comma after every byte unless last byte
                     bytecounter++;
