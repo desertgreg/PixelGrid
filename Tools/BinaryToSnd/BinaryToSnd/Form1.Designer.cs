@@ -1,5 +1,5 @@
 ﻿
-namespace BinaryToCpp
+namespace BinaryToSnd
 {
     partial class Form1
     {

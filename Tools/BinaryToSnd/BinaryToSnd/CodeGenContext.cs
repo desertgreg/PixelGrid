@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 
 
-namespace BinaryToCpp
+namespace BinaryToSnd
 {
     public class CodeGenContext
     {
