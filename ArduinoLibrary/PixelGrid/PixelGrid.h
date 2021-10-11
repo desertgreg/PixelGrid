@@ -6,6 +6,7 @@
 #include "PGSounds.h"
 #include "PGGraphics.h"
 #include "PGSystemSounds.h"
+#include "PGSystemImages.h"
 
 class PixelGrid
 {
