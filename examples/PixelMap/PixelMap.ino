@@ -28,7 +28,7 @@ void loop() {
   }
 
   PixelGrid.clear();
-  PixelGrid.drawPixelmap(x>>3,y>>3,CharacterTestImg);
+  PixelGrid.drawImage(x>>3,y>>3,CharacterTestImg);
   
   PixelGrid.update();
 }
