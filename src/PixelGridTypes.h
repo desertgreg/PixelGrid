@@ -1,14 +1,45 @@
-#ifndef PGRENDER_H
-#define PGRENDER_H
-
+#ifndef PIXELGRIDTYPES_H
+#define PIXELGRIDTYPES_H
 
 #include <stdint.h>
 #include <string.h>
+
+//
+// Pixelgrid buttons enumeration
+//
+enum PGButton : uint8_t
+{
+	U = 0,
+	R,
+	D,
+	L,
+	OK,
+	A,
+	B,
+
+	BCOUNT
+};
+
+//
+// Sound effect definition
+//
+class PGSound
+{
+public:
+	PGSound(const uint8_t * data,uint16_t size) : m_Size(size), m_Data(data) {}
+	
+	uint16_t m_Size;
+	const uint8_t * m_Data;
+};
+
 
 #define PGCOLOR(r,g,b) ((r<<16) | (g<<8) | (b))
 typedef uint32_t pgcolor;
 
 
+//
+// 8x8 bit mask (1 bit per pixel)
+//
 class PGBitmap8  // 8x8 single color bitmap
 {
 public:
@@ -21,27 +52,18 @@ public:
 	uint8_t m_Pixels[8];
 };
 
-
-class PGPixelMap
+// 
+// RGBA Image
+//
+class PGImage
 {
 public:
-	PGPixelMap(const uint8_t * data, uint16_t w,uint16_t h) : m_Width(w),m_Height(h),m_PixelData(data) {}
+	PGImage(const uint8_t * data, uint16_t w,uint16_t h) : m_Width(w),m_Height(h),m_PixelData(data) {}
 	uint16_t m_Width;
 	uint16_t m_Height;
 	const uint8_t * m_PixelData;
 };
 
-class PGGraphics
-{
-public:
-	static void Setup();
-	static void Update();
 
-	static void Clear();
-	static void Fill(pgcolor color);
-	static void SetPixel(int x,int y,pgcolor color);
-	static void DrawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color);
-	static void DrawPixelmap(int x, int y,PGPixelMap & pmp);
-};
 
-#endif //PGBUTTONS_H
+#endif //PIXELGRIDTYPES_H

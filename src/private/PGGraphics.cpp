@@ -10,17 +10,17 @@
 Adafruit_NeoPixel_ZeroDMA g_FrameBuffer(PIXEL_COUNT, PIXEL_PIN, NEO_GRB);
 
 
-void PGGraphics::Setup()
+void PGGraphics::setup()
 {
 	g_FrameBuffer.begin();
 }
 
-void PGGraphics::Update()
+void PGGraphics::update()
 {
 	g_FrameBuffer.show();
 }
 
-void PGGraphics::Clear()
+void PGGraphics::clear()
 {
 	for (int i=0; i<PIXEL_COUNT; ++i)
 	{
@@ -28,7 +28,7 @@ void PGGraphics::Clear()
 	}
 }
 
-void PGGraphics::Fill(pgcolor color)
+void PGGraphics::fill(pgcolor color)
 {
 	for (int i=0; i<PIXEL_COUNT; ++i)
 	{
@@ -36,14 +36,14 @@ void PGGraphics::Fill(pgcolor color)
 	}
 }
 
-void PGGraphics::SetPixel(int x,int y,pgcolor color)
+void PGGraphics::setPixel(int x,int y,pgcolor color)
 {
 	if ((x < 0) || (x >= 13)) return;
 	if ((y < 0) || (y >= 13)) return;
 	g_FrameBuffer.setPixelColor(x + y*13,color);
 }
 
-void PGGraphics::DrawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color)
+void PGGraphics::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color)
 {
 	int src_x0 = 0;
 	int src_y0 = 0;
@@ -89,15 +89,15 @@ void PGGraphics::DrawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color)
 }
 
 
-void PGGraphics::DrawPixelmap(int x, int y,PGPixelMap & pmp)
+void PGGraphics::drawImage(int x, int y,PGImage & img)
 {
 	int src_x0 = 0;
 	int src_y0 = 0;
 	
 	int dst_x0 = x;
 	int dst_y0 = y;
-	int dst_x1 = x+pmp.m_Width;
-	int dst_y1 = y+pmp.m_Height;
+	int dst_x1 = x+img.m_Width;
+	int dst_y1 = y+img.m_Height;
 
 	if (x < 0)
 	{
@@ -119,10 +119,10 @@ void PGGraphics::DrawPixelmap(int x, int y,PGPixelMap & pmp)
 	}
 
 	int src_y = src_y0;
-	int stride = 4*pmp.m_Width;
+	int stride = 4*img.m_Width;
 	for (int j=dst_y0; j<dst_y1; ++j)
 	{
-		const uint8_t * src_pixel = &(pmp.m_PixelData[src_x0*4 + src_y*stride]);
+		const uint8_t * src_pixel = &(img.m_PixelData[src_x0*4 + src_y*stride]);
 		for (int i=dst_x0; i<dst_x1; ++i)
 		{
 			const int DIM = 4;
@@ -135,5 +135,4 @@ void PGGraphics::DrawPixelmap(int x, int y,PGPixelMap & pmp)
 		}
 		src_y++;
 	}
-
 }

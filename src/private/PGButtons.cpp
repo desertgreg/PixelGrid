@@ -20,7 +20,7 @@ struct ButtonStruct
     m_Pin = 0;
   }
   
-  void Update(uint8_t cur_time)
+  void update(uint8_t cur_time)
   {
     uint8_t new_state = !digitalRead(m_Pin);
     m_PrevState = m_CurState;  
@@ -35,26 +35,26 @@ struct ButtonStruct
     m_DebounceState = new_state;
   }
 
-  uint8_t Was_Pressed()
+  uint8_t wasPressed()
   {
     return m_CurState && !m_PrevState;
   }
-  uint8_t Was_Released()
+  uint8_t wasReleased()
   {
     return !m_CurState && m_PrevState;
   }
 
-  uint8_t Is_Down()
+  uint8_t isDown()
   {
     return m_CurState;
   }
 };
 
 
-ButtonStruct m_Buttons[PGButtons::BCOUNT];
+ButtonStruct m_Buttons[PGButton::BCOUNT];
 
 
-void PGButtons::Setup()
+void PGButtons::setup()
 {
   // set arduino pin assignments
   m_Buttons[U].m_Pin = 8;   // 11, PA06
@@ -75,32 +75,32 @@ void PGButtons::Setup()
   }
   
   // update a few times to eat any inital presses
-  Update();
-  Update();
-  Update();
+  update();
+  update();
+  update();
 }
 
 
-void PGButtons::Update()
+void PGButtons::update()
 {
   uint8_t cur_time = millis();
   for (int i=0; i<BCOUNT; ++i)
   {
-    m_Buttons[i].Update(cur_time);
+    m_Buttons[i].update(cur_time);
   }
 }
 
-uint8_t PGButtons::Is_Down(ButtonType b)
+uint8_t PGButtons::isDown(PGButton b)
 {
-  return m_Buttons[b].Is_Down();
+  return m_Buttons[b].isDown();
 }
 
-uint8_t PGButtons::Was_Pressed(ButtonType b)
+uint8_t PGButtons::wasPressed(PGButton b)
 {
-  return m_Buttons[b].Was_Pressed();
+  return m_Buttons[b].wasPressed();
 }
 
-uint8_t PGButtons::Was_Released(ButtonType b)
+uint8_t PGButtons::wasReleased(PGButton b)
 {
-  return m_Buttons[b].Was_Released();
+  return m_Buttons[b].wasReleased();
 }
