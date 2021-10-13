@@ -4,28 +4,26 @@
 void setup() 
 {
   SerialUSB.begin(115200);
-  PGButtons::Setup();
-  PGSounds::Setup();
-  PGGraphics::Setup();
+  PixelGrid.setup();
 }
 
 void sounds()
 {
-  if (PGButtons::Was_Pressed(PGButtons::A))
+  if (PixelGrid.wasPressed(PGButton::A))
   {
-    PGSounds::Play(PGSounds::Powerup);
+    PixelGrid.playSound(MenuMoveSnd);
   }
-  if (PGButtons::Was_Pressed(PGButtons::B))
+  if (PixelGrid.wasPressed(PGButton::B))
   {
-    PGSounds::Play(PGSounds::Blip);
+    PixelGrid.playSound(MonsterHurtSnd);
   }
-  if (PGButtons::Was_Pressed(PGButtons::OK))
-  {
-  }
-  if (PGButtons::Was_Pressed(PGButtons::U))
+  if (PixelGrid.wasPressed(PGButton::OK))
   {
   }
-  if (PGButtons::Was_Pressed(PGButtons::D))
+  if (PixelGrid.wasPressed(PGButton::U))
+  {
+  }
+  if (PixelGrid.wasPressed(PGButton::D))
   {
   }
 }
@@ -66,26 +64,26 @@ void my_program()
   start_g = inc_channel(start_g);
   start_g = inc_channel(start_g);
   start_b = inc_channel(start_b);
-  bool flash = PGButtons::Is_Down(PGButtons::B);
+  bool flash = PixelGrid.isDown(PGButton::B);
   
-  PGGraphics::Clear();
+  PixelGrid.clear();
   phase++;
   for (int i=0; i<13; ++i)
   {
     float x = (float)i * spd + (float)phase * 0.4f;
     float y = 7.0f + amplitude * sin(x);
     int yval = (int)y;
-    PGGraphics::SetPixel(i,yval,PGCOLOR(start_r>>4,start_g>>4,start_b>>4));
+    PixelGrid.setPixel(i,yval,PGCOLOR(start_r>>4,start_g>>4,start_b>>4));
     
     int r2 = start_r-8;
     int g2 = start_g-8;
     int b2 = start_b-8;
     for (int c=yval+1;c<13; ++c)
     {
-      PGGraphics::SetPixel(i,c,PGCOLOR(r2>>4,g2>>4,b2>>4));
+      PixelGrid.setPixel(i,c,PGCOLOR(r2>>4,g2>>4,b2>>4));
       if (flash && (c == yval+2))
       {
-        PGGraphics::SetPixel(i,c,PGCOLOR(r2>>2,g2>>1,b2>>2));
+        PixelGrid.setPixel(i,c,PGCOLOR(r2>>2,g2>>1,b2>>2));
       }
       r2-=4;
       g2-=4;
@@ -95,19 +93,18 @@ void my_program()
       if (b2 < 0) b2 = 0;
     }
   }
-  delay(10); // Pause before next pass through loop
 
-  if (PGButtons::Was_Pressed(PGButtons::U)) amplitude += 0.2f;
-  if (PGButtons::Was_Pressed(PGButtons::D)) amplitude -= 0.2f;
-  if (PGButtons::Was_Pressed(PGButtons::L)) spd-=0.1f;
-  if (PGButtons::Was_Pressed(PGButtons::R)) spd+=0.1f;
-  if (PGButtons::Was_Pressed(PGButtons::OK)) { amplitude = INIT_AMP; spd = INIT_SPD; }
-  if (PGButtons::Was_Pressed(PGButtons::A)) { start_r = random(min_val,max_val); start_g = random(min_val,max_val); start_b = random(min_val - max_val); }
+  if (PixelGrid.wasPressed(PGButton::U)) amplitude += 0.2f;
+  if (PixelGrid.wasPressed(PGButton::D)) amplitude -= 0.2f;
+  if (PixelGrid.wasPressed(PGButton::L)) spd-=0.1f;
+  if (PixelGrid.wasPressed(PGButton::R)) spd+=0.1f;
+  if (PixelGrid.wasPressed(PGButton::OK)) { amplitude = INIT_AMP; spd = INIT_SPD; }
+  if (PixelGrid.wasPressed(PGButton::A)) { start_r = random(min_val,max_val); start_g = random(min_val,max_val); start_b = random(min_val - max_val); }
   
   static int _pcounter =  0;
-  for (int i=0; i<PGButtons::BCOUNT; ++i)
+  for (int i=0; i<PGButton::BCOUNT; ++i)
   {
-    if (PGButtons::Was_Pressed((PGButtons::ButtonType)i)) {
+    if (PixelGrid.wasPressed((PGButton)i)) {
       SerialUSB.print(i);
       _pcounter++;
     }
@@ -128,7 +125,5 @@ void loop()
   my_program();
 
   // When you're done with the logic for a frame, let the system update
-  PGButtons::Update();
-  PGSounds::Update();
-  PGGraphics::Update();
+  PixelGrid.update();
 }

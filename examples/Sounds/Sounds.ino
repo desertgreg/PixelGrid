@@ -3,7 +3,7 @@
 void setup() {
   
   SerialUSB.begin(115200);
-  PixelGrid::Setup();
+  PixelGrid.setup();
   
 }
 
@@ -35,13 +35,13 @@ int wrap_sound(int val)
 void loop() {
 
   bool moved = false;
-  if (PGButtons::Was_Pressed(PGButtons::R)) { cursor++; moved = true;}
-  if (PGButtons::Was_Pressed(PGButtons::L)) { cursor--; moved = true;}
+  if (PixelGrid.wasPressed(PGButton::R)) { cursor++; moved = true;}
+  if (PixelGrid.wasPressed(PGButton::L)) { cursor--; moved = true;}
   cursor = wrap_sound(cursor);
   
-  if (moved || PGButtons::Was_Pressed(PGButtons::A))
+  if (moved || PixelGrid.wasPressed(PGButton::A))
   {
-    PGSounds::Play(*sounds[cursor]);
+    PixelGrid.playSound(*sounds[cursor]);
   }
-  PixelGrid::Update();
+  PixelGrid.update();
 }

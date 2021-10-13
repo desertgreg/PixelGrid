@@ -10,7 +10,7 @@ int y = 6;
 void setup() 
 {
   SerialUSB.begin(115200);
-  PixelGrid::Setup();
+  PixelGrid.setup();
 }
 
 int wrap(int val) 
@@ -23,35 +23,35 @@ int wrap(int val)
 void hello_world()
 {
   // Use the buttons to move x,y around the screen
-  if (PGButtons::Was_Pressed(PGButtons::U))
+  if (PixelGrid.wasPressed(PGButton::U))
   {
     y=y-1;
     y=wrap(y);
   }
-  if (PGButtons::Was_Pressed(PGButtons::D))
+  if (PixelGrid.wasPressed(PGButton::D))
   {
     y=y+1;
     y=wrap(y);
   }
-  if (PGButtons::Was_Pressed(PGButtons::L))
+  if (PixelGrid.wasPressed(PGButton::L))
   {
     x=x-1;
     x=wrap(x);
   }
-  if (PGButtons::Was_Pressed(PGButtons::R))
+  if (PixelGrid.wasPressed(PGButton::R))
   {
     x=x+1;
     x=wrap(x);
   }
 
   // Play a sound if A is pressed
-  if (PGButtons::Was_Pressed(PGButtons::A))
+  if (PixelGrid.wasPressed(PGButton::A))
   {
-    PGSounds::Play(PGSounds::Powerup);
+    PixelGrid.playSound(TakeDamageSnd);
   }
   
   // Draw a dot at x,y
-  PGGraphics::SetPixel(x,y,PGCOLOR(10,3,4));
+  PixelGrid.setPixel(x,y,PGCOLOR(10,3,4));
 }
 
 void loop() 
@@ -60,5 +60,5 @@ void loop()
   hello_world();
 
   // When you're done with the logic for a frame, let the system update
-  PixelGrid::Update();
+  PixelGrid.update();
 }
