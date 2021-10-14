@@ -1,14 +1,22 @@
 #include "PGGraphics.h"
+#include "private/PGFrameBuffer.h"
 #include <stdint.h>
 #include <Arduino.h>
 #include <SamD.h>
-#include <Adafruit_NeoPixel_ZeroDMA.h>
 
+#define USE_ADAFRUIT 0
 #define PIXEL_PIN   12 
 #define PIXEL_COUNT 13*13 
 
+#if USE_ADAFRUIT
+
+#include <Adafruit_NeoPixel_ZeroDMA.h>
 Adafruit_NeoPixel_ZeroDMA g_FrameBuffer(PIXEL_COUNT, PIXEL_PIN, NEO_GRB);
 
+#else
+PGFrameBuffer g_FrameBuffer;
+
+#endif
 
 void PGGraphics::setup()
 {

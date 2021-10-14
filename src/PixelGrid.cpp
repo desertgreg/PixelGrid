@@ -1,4 +1,5 @@
 #include "PixelGrid.h"
+#include "private/PGFrameBuffer.h"
 
 uint32_t s_LastMillis = 0;
 
