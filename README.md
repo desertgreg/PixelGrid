@@ -30,7 +30,7 @@ In the board manager, enter **Zero** in the search bar and then install the **Ar
 
 Soon I will publish the PixelGrid library into the official arduino system.  For now, just put the contents of this git repo in your Documents/Arduino/Libraries folder.  It should look like this:
 
-![image](https://user-images.githubusercontent.com/15841740/137390389-87bf8734-23e7-40b4-a274-ecc1381eeb2d.png)
+![image](https://user-images.githubusercontent.com/15841740/137391627-fa150864-d88a-4e33-95bb-6107377daf4b.png)
 
 Pixelgrid currently depends on one other library from Adafruit.  This will soon be automatic but for now install it as well by using the library manager:
 
@@ -42,7 +42,10 @@ Enter **Adafruit SAMD21** into the search bar to narrow down the list of librari
 
 # Examples
 
-The PixelGrid API is very simple.  Take a look at the example sketches under the libraries/PixelGrid/examples folder to get started!.
+The PixelGrid API is very simple.  Take a look at the example sketches under the libraries/PixelGrid/examples folder to get started!.  Make sure you select your board type as shown below:
+
+![image](https://user-images.githubusercontent.com/15841740/137393024-654d152c-acab-4d2d-8575-d360f2f990c7.png)
+
 
 
 
