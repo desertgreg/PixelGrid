@@ -20,7 +20,7 @@ The installer may ask you to install one or more drivers.  Is important to insta
 # Board Package
 The next step is to launch the arduino IDE and install a board package to allow it to program your PixelGrid.  First navigate to the board manager as shown below:
 
-![BoardManager](https://user-images.githubusercontent.com/15841740/136675654-8e66323e-57d0-43a6-ade7-a653de5ffdc6.png)
+![image](https://user-images.githubusercontent.com/15841740/137393280-f8be4661-19ba-4803-bf9d-8927306a4662.png)
 
 In the board manager, enter **Zero** in the search bar and then install the **Arduino SAMD Boards** package.  The process of installing the board package may ask you to install driers as well, select 'install' for all of these.  Once the Arduino SAMD Boards package is installed, you can close the board manager.
 
