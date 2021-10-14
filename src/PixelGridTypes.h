@@ -33,7 +33,8 @@ public:
 };
 
 
-#define PGCOLOR(r,g,b) ((r<<16) | (g<<8) | (b))
+// AGRB byte order but little endian so B is in the MSB.
+#define PGCOLOR(r,g,b) ((b<<24) | (r<<16) | (g<<8) )
 typedef uint32_t pgcolor;
 
 

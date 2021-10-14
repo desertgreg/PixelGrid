@@ -24,7 +24,7 @@ void introUpdate()
 	// Startup animation
 	if (first == 1)
 	{
-		PGSounds::play(PixelgridStartupSnd);
+		//PGSounds::play(PixelgridStartupSnd);
 		first = 0;
 	}
 	if ((startup_x>>1) > -PixelGridImg.m_Width-5)
