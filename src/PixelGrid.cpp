@@ -1,9 +1,14 @@
 #include "PixelGrid.h"
 #include "private/PGFrameBuffer.h"
+#include "private/PGTransition.h"
+#include "private/PGMenu.h"
+
 
 uint32_t s_LastMillis = 0;
 
 PixelGridController PixelGrid;
+PGTransition m_Transitions;
+
 
 
 void PixelGridController::setup()
@@ -11,15 +16,14 @@ void PixelGridController::setup()
 	PGButtons::setup();
 	PGSounds::setup();
 	PGGraphics::setup();
+	m_introDone = false;
 }
 
-void introUpdate()
+
+void PixelGridController::introUpdate()
 {
 	static int first = 1;
 	static int startup_x = 15<<1;
-	static int done = 0;
-	
-	if (done) return;
 	
 	// Startup animation
 	if (first == 1)
@@ -35,14 +39,21 @@ void introUpdate()
 	}
 	else
 	{
-		done = 1;
+		m_introDone = true;
 	}
 }
 
 
 void PixelGridController::update()
 {
-	introUpdate();
+	if (!m_introDone) 
+	{
+		introUpdate();
+	}
+	else if (m_appsEnabled)
+	{
+		PGMenu::update();
+	}
 	
 	PGButtons::update();
 	PGSounds::update();
@@ -55,5 +66,16 @@ void PixelGridController::update()
 		cur = millis();
 	}; 
 	s_LastMillis = cur;
+}
+
+void PixelGridController::enableApps(bool onoff)
+{
+	PGMenu::setup();
+	m_appsEnabled = onoff;
+}
+
+void PixelGridController::addApp(PGApp & app)
+{
+	PGMenu::addApp(app);
 }
 

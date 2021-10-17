@@ -99,4 +99,5 @@ void PGFrameBuffer::show()
 		*out++ = expand>>8;
 		*out++ = expand;
 	}
+	
 }

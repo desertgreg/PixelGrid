@@ -66,5 +66,53 @@ public:
 };
 
 
+//
+// PGApp objects are like little applications.  Your game or application will be launched when the user selects
+// it out of the main menu.  You just supply an icon and a 'start' and 'update' function.
+//
+class PGApp
+{
+public:
+	virtual void start() = 0;
+	virtual void update() = 0;
+	virtual PGBitmap8 & getIcon() = 0;
+};
+
+
+
+//
+// This class will 'scroll' a value toward a target value internally using 8bit fixed point math.
+// A velocity of 256 will move the value 1 unit per update (and updates are normally 100fps)
+//
+class PGScrollerClass
+{
+public:
+	int16_t get() { return m_pos>>8; }
+	void setDest(int16_t val) { m_destPos = val<<8; }
+	void setDelta(int16_t val) { m_destPos = m_destPos + (val<<8); }
+	void setImmediate(int16_t val) { m_pos = val<<8; m_destPos = val<<8; }
+	void setSpeed(int16_t spd) { m_speed = spd; }
+	bool isDone() { return m_pos == m_destPos; }
+	bool isScrolling() { return m_pos != m_destPos; }
+	
+	void debugPrint();
+
+	void update() 
+	{ 
+		if (m_pos != m_destPos)
+		{
+			if (m_pos < m_destPos + m_speed) { m_pos += m_speed; }
+			else if (m_pos > m_destPos - m_speed) { m_pos -= m_speed; }
+			else { m_pos = m_destPos; }
+		}
+	}
+	
+protected:
+	int m_pos = 0;
+	int m_destPos = 0;
+	uint16_t m_speed = 256;
+};
+
+
 
 #endif //PIXELGRIDTYPES_H
