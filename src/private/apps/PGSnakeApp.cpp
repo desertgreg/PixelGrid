@@ -111,14 +111,13 @@ void PGSnakeApp::update()
 		}
 	}
 	// speedup
-	/*
 	m_speedupCounter--;
 	if (m_speedupCounter <= 0)
 	{
-		if (m_moveDelay > 10) m_moveDelay--;
+		if (m_moveDelay > 15) m_moveDelay--;
 		m_speedupCounter = SPEEDUP_COUNT;
 	}
-*/
+
 	// if its time to move the head, 
 	m_moveCounter--;
 	if (m_moveCounter <= 0)
