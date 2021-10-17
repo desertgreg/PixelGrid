@@ -5,6 +5,7 @@
 #include "PGSystemSounds.h"
 #include "PGTransition.h"
 #include "PixelGridTypes.h"
+#include "apps/PGSnakeApp.h"
 
 #define ICON_SIZE 8
 #define ICON_SPACING 11
@@ -43,6 +44,10 @@ void PGMenu::setup()
 	m_apps[2] = &m_TestApp;
 	m_apps[3] = &m_TestApp;
 	m_appCount = 4;
+
+	PGSnakeApp * snake = new PGSnakeApp;
+	addApp(*snake);
+	
 	m_menuScroller.setImmediate(0);
 	m_menuScroller.setSpeed(256);
 }
