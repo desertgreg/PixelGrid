@@ -59,8 +59,8 @@ namespace PGImageTool
 
         void Write_Image_Preamble(CodeGenContext con, string imagename)
         {
-            con.sbcpp.Append("static const uint8_t " + con.Array_Name(imagename) + "[] = {\r\n");
-            con.sbh.Append("extern PGPixelMap " + con.Obj_Name(imagename) + ";\r\n");
+            con.sbcpp.Append("static const pgcolor " + con.Array_Name(imagename) + "[] = {\r\n");
+            con.sbh.Append("extern PGImage " + con.Obj_Name(imagename) + ";\r\n");
         }
 
 
@@ -90,10 +90,13 @@ namespace PGImageTool
                     for (int i=0; i<bitmap.Width; ++i)
                     {
                         Color pixel = bitmap.GetPixel(i,j);
-                        con.sbcpp.Append("0x" + Convert.ToString(pixel.R, 16).PadLeft(2, '0') + ",");
-                        con.sbcpp.Append("0x" + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + ",");
-                        con.sbcpp.Append("0x" + Convert.ToString(pixel.B, 16).PadLeft(2, '0') + ",");
-                        con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0'));
+
+                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + ",");
+                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.B, 16).PadLeft(2, '0') + ",");
+                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + ",");
+                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.R, 16).PadLeft(2, '0') );
+
+                        con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + Convert.ToString(pixel.B, 16).PadLeft(2, '0') + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + Convert.ToString(pixel.R, 16).PadLeft(2, '0'));
 
                         // comma after every byte unless last byte
                         bytecounter++;
@@ -123,8 +126,8 @@ namespace PGImageTool
 
         void Write_Image_Postamble(CodeGenContext con, string imagename, int w,int h)
         {
-            con.sbcpp.Append("};\r\n");
-            con.sbcpppost.Append("PGPixelMap " + con.Obj_Name(imagename) + "(" + con.Array_Name(imagename) + "," + w.ToString() + "," + h.ToString() + ");\r\n");
+            con.sbcpp.Append("\r\n};\r\n");
+            con.sbcpppost.Append("PGImage " + con.Obj_Name(imagename) + "((uint8_t*)" + con.Array_Name(imagename) + "," + w.ToString() + "," + h.ToString() + ");\r\n");
         }
         void Write_File_Postamble(CodeGenContext con, string filename)
         {
