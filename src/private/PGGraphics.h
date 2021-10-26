@@ -12,6 +12,10 @@ public:
 	static void setup();
 	static void update();
 
+	// drawing state
+	static void setBlendMode(PGBlendMode bm);
+	static void setDrawBrightness(uint8_t bright);
+	
 	static void clear();
 	static void fill(pgcolor color);
 	static void setPixel(int x,int y,pgcolor color);
@@ -21,6 +25,11 @@ public:
 	static void drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	static void drawBitmapInvert(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	static void drawImage(int x, int y,PGImage & img);
+	static void drawImage2(int x, int y,PGImage & img);
+	
+private:
+	static void clipImage(int x, int y,PGImage & img);
+
 };
 
 #endif //PGBUTTONS_H

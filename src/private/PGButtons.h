@@ -13,7 +13,6 @@ public:
   static uint8_t isDown(PGButton b);
   static uint8_t wasPressed(PGButton b);
   static uint8_t wasReleased(PGButton b);
-
 };
 
 #endif //PGBUTTONS_H

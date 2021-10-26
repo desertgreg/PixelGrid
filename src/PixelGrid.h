@@ -30,15 +30,20 @@ public:
 	void playSound(PGSound & sound);
 
 	// Graphics
+	void setBlendMode(PGBlendMode bm);
+	void setDrawBrightness(uint8_t bright);
+
 	void clear();
+	void setBrightness(uint8_t bright);
 	void fill(pgcolor color);
 	void setPixel(int x,int y,pgcolor color);
 	void drawBox(int x0,int y0,int x1, int y1,pgcolor color);
 	void drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	void drawImage(int x, int y,PGImage & pmp);
+	void drawImage2(int x, int y,PGImage & pmp);
 	
 	// Apps (optional, enables a menu and multiple applications, add your game using 'addApp')
-	void enableApps(bool onoff);
+	void enableApps(bool onoff = true);
 	void addApp(PGApp & app);
 
 private:
@@ -60,12 +65,16 @@ inline uint8_t PixelGridController::wasReleased(PGButton b) { return PGButtons::
 
 inline void PixelGridController::playSound(PGSound & sound) { PGSounds::play(sound); }
 
+inline void PixelGridController::setBlendMode(PGBlendMode bm) { PGGraphics::setBlendMode(bm); }
+inline void PixelGridController::setDrawBrightness(uint8_t bright) { PGGraphics::setDrawBrightness(bright); }
 inline void PixelGridController::clear() { PGGraphics::clear(); }
+inline void PixelGridController::setBrightness(uint8_t bright) { PGGraphics::setDrawBrightness(bright); }
 inline void PixelGridController::fill(pgcolor color) { PGGraphics::fill(color); }
 inline void PixelGridController::setPixel(int x,int y,pgcolor color) { PGGraphics::setPixel(x,y,color); }
 inline void PixelGridController::drawBox(int x0,int y0,int x1, int y1,pgcolor color) { PGGraphics::drawBox(x0,y0,x1,y1,color); }
 inline void PixelGridController::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color) { PGGraphics::drawBitmap(x,y,bmp,color); }
 inline void PixelGridController::drawImage(int x, int y,PGImage & pmp) { PGGraphics::drawImage(x,y,pmp); }
+inline void PixelGridController::drawImage2(int x, int y,PGImage & pmp) { PGGraphics::drawImage2(x,y,pmp); }
 
 
 #endif //PIXELGRID_H

@@ -46,7 +46,7 @@ void PGSnakeApp::start()
 #define SNAKE_COLOR(i) PGCOLOR(5,12,5)
 
 
-void PGSnakeApp::check_new_head_location(int x,int y)
+void PGSnakeApp::checkNewHeadLocation(int x,int y)
 {
 	// does this collide with the snake?
 	int seg = m_snakeHead;
@@ -83,13 +83,8 @@ void PGSnakeApp::check_new_head_location(int x,int y)
 	}
 }
 
-
-
-void PGSnakeApp::update()
+void PGSnakeApp::drawSnake()
 {
-
-	PixelGrid.clear();
-
 	// draw the snake
 	int seg = m_snakeHead;
 	for (int i=0; i<m_snakeSegs; i++)
@@ -101,7 +96,10 @@ void PGSnakeApp::update()
 		seg++;
 		if (seg >= MAX_SEGMENTS) seg = 0;
 	}
+}
 
+void PGSnakeApp::drawApples()
+{
 	// draw the apples
 	for (int i=0; i<MAX_APPLES; i++)
 	{
@@ -110,6 +108,15 @@ void PGSnakeApp::update()
 			PixelGrid.setPixel(m_apples[i].m_x,m_apples[i].m_y,APPLE_COLOR);
 		}
 	}
+}
+
+void PGSnakeApp::update()
+{
+	PixelGrid.clear();
+	
+	drawSnake();
+	drawApples();
+	
 	// speedup
 	m_speedupCounter--;
 	if (m_speedupCounter <= 0)
@@ -117,7 +124,7 @@ void PGSnakeApp::update()
 		if (m_moveDelay > 15) m_moveDelay--;
 		m_speedupCounter = SPEEDUP_COUNT;
 	}
-
+	
 	// if its time to move the head, 
 	m_moveCounter--;
 	if (m_moveCounter <= 0)
@@ -131,7 +138,7 @@ void PGSnakeApp::update()
 		y = wrap(y);
 
 		// game logic for moving into new location
-		check_new_head_location(x,y);
+		checkNewHeadLocation(x,y);
 
 		m_snakeHead--;
 		if (m_snakeHead < 0) m_snakeHead = MAX_SEGMENTS-1;

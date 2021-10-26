@@ -54,7 +54,7 @@ namespace PGImageTool
             con.sbh.Append("#ifndef " + con.Header_Guard() + "\r\n");
             con.sbh.Append("#define " + con.Header_Guard() + "\r\n\r\n");
 
-            con.sbh.Append("#include \"PGGraphics.h\"\r\n\r\n");
+            con.sbh.Append("#include \"PixelGrid.h\"\r\n\r\n");
         }
 
         void Write_Image_Preamble(CodeGenContext con, string imagename)
@@ -96,7 +96,7 @@ namespace PGImageTool
                         //con.sbcpp.Append("0x" + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + ",");
                         //con.sbcpp.Append("0x" + Convert.ToString(pixel.R, 16).PadLeft(2, '0') );
 
-                        con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + Convert.ToString(pixel.B, 16).PadLeft(2, '0') + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + Convert.ToString(pixel.R, 16).PadLeft(2, '0'));
+                        con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + Convert.ToString(pixel.R, 16).PadLeft(2, '0') + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + Convert.ToString(pixel.B, 16).PadLeft(2, '0'));
 
                         // comma after every byte unless last byte
                         bytecounter++;

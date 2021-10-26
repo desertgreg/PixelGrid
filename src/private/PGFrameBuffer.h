@@ -10,7 +10,9 @@
 const int NEOPIXEL_PIN = 12;
 
 // number of pixels in the frame buffer
-const int NUMPIXELS = 13*13;
+const int PIXELS_W = 13;
+const int PIXELS_H = 13;
+const int NUMPIXELS = PIXELS_W*PIXELS_H;
 
 // Each pixel in the backbuffer has 4 bytes but we only use 3.  ARGB -> skip every 'A'
 // Then each bit is expanded to 3 bits to for transmission to neopixels.  
@@ -47,6 +49,18 @@ protected:
 	SPIClass *m_Spi;        
 
 };
+
+
+
+inline void PGFrameBuffer::setPixelColor(int addr, pgcolor color)
+{
+	m_BackBuffer[addr] = color;
+}
+
+inline pgcolor * PGFrameBuffer::getBackBuffer()
+{
+	return &(m_BackBuffer[0]);
+}
 
 
 #endif //PGFRAMEBUFFER_H

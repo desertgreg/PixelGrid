@@ -1,3 +1,5 @@
 Tools/BinaryToCpp/BinaryToCpp/obj/
 Tools/BinaryToSnd/BinaryToSnd/obj/
 *.suo
+extras/Tools/PGImageTool/.vs/
+extras/Tools/PGImageTool/PGImageTool/obj/

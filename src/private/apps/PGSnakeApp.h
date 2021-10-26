@@ -16,7 +16,9 @@ public:
 	
 protected:
 
-	void check_new_head_location(int x,int y);
+	void checkNewHeadLocation(int x,int y);
+	void drawSnake();
+	void drawApples();
 	
 	enum SNAKE_FLAGS
 	{
@@ -58,6 +60,16 @@ protected:
 	const int m_moveX[4] = { 0,1,0,-1 };
 	const int m_moveY[4] = { -1,0,1,0 };
 	PGBitmap8 m_icon;
+	
+	
+	enum
+	{
+		STATE_STARTING = 0,	// apples form, snake forms, wait for keypress
+		STATE_PLAYING,		// play snake until you hit a wall or yourself
+		STATE_LOST,			// blink snake, explode parts, hide apples, go to starting
+	};
+	int m_state;
+	int m_stateCounter;
 };
 
 

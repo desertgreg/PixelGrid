@@ -6,11 +6,11 @@
 // PIN_SPI_MISO = 22		// TODO, on PixelGrid, I think I have these connected to SCL/SDA?
 // PIN_SPI_SCK = 24
 // PIN_LED = 13
-// SDA = 20					
+// SDA = 20
 // SCL = 21
 // Serial1 is on 0(RX), 1(TX)
 // Arduino Zero default SPI is on port pins: PB11 (SCK), PB10 (MOSI) and PA12 (MISO)
-// In Arduino Zero's Schematic there is two ports with I2C communication, D3/D4(PA09/PA08) e I2C_SDA/I2C_SCL(PA22/PA23).
+// In Arduino Zero's Schematic there are two ports with I2C communication, D3/D4(PA09/PA08), I2C_SDA/I2C_SCL(PA22/PA23).
 
 
 void PGFrameBuffer::begin()
@@ -44,17 +44,7 @@ void PGFrameBuffer::setBrightness(uint8_t val)
 	m_Brightness = val + 1;  // 255 brightness -> store as 256 (1.0 in 8.8 fixed point)
 }
 
-void PGFrameBuffer::setPixelColor(int addr, pgcolor color)
-{
-	m_BackBuffer[addr] = color;
-}
-
-pgcolor * PGFrameBuffer::getBackBuffer()
-{
-	return &(m_BackBuffer[0]);
-}
-
-uint32_t PGFrameBuffer::expand_byte(uint8_t byte)
+inline uint32_t PGFrameBuffer::expand_byte(uint8_t byte)
 {
 	uint32_t expanded = 0;
 	
@@ -78,22 +68,26 @@ void PGFrameBuffer::show()
 	uint32_t expand;
 	for (int i=0; i<NUMPIXELS; i++) 
 	{
+		// read from our framebuffer, pixels are in 0xaarrggbb format
+		// due to little endian, first byte is b, then g,r,a
 		uint8_t a,r,g,b;
-		a = *in++;  // alpha gets ignored
-
-		r = *in++;
-		expand = expand_byte(r);
-		*out++ = expand>>16;
-		*out++ = expand>>8;
-		*out++ = expand;
-
+		b = *in++;  
 		g = *in++;
+		r = *in++;
+		a = *in++;	// alpha gets ignored
+		
+		// Send bytes to Neopixels in G R B order
+		// (verified bye order by hand)
 		expand = expand_byte(g);
 		*out++ = expand>>16;
 		*out++ = expand>>8;
 		*out++ = expand;
+
+		expand = expand_byte(r);
+		*out++ = expand>>16;
+		*out++ = expand>>8;
+		*out++ = expand;
 		
-		b = *in++;
 		expand = expand_byte(b);
 		*out++ = expand>>16;
 		*out++ = expand>>8;

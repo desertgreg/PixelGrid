@@ -16,3 +16,12 @@ C:\Users\greg\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGI
 C:\Users\greg\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.csproj.CoreCompileInputs.cache
 C:\Users\greg\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.exe
 C:\Users\greg\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.pdb
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\bin\Debug\PGImageTool.exe
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\bin\Debug\PGImageTool.pdb
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.csprojAssemblyReference.cache
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.Form1.resources
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.Properties.Resources.resources
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.csproj.GenerateResource.cache
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.csproj.CoreCompileInputs.cache
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.exe
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Debug\PGImageTool.pdb

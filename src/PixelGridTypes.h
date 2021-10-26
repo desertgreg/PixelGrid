@@ -33,9 +33,34 @@ public:
 };
 
 
-// AGRB byte order but little endian so B is in the MSB.
-#define PGCOLOR(r,g,b) ((b<<24) | (r<<16) | (g<<8) )
+// In the PixelGridlibrary we will do everyting in ARGB byte order and at the frame-buffer level we'll reorder
+// the bytes as needed by neopixels.  This means in memory a 32bit pixel looks like this:
+//   0xaarrggbb
+// And if you look at that pixel through a uint8_t pointer it looks like this:
+//   b = pixel[0]
+//   g = pixel[1]
+//   r = pixel[2]
+//   a = pixel[3]
+// (This is little endian byte ordering)
+#define PG_ASHIFT 24
+#define PG_RSHIFT 16
+#define PG_GSHIFT 8
+#define PG_BSHIFT 0
+
+#define PGCOLOR(r,g,b) ((r<<PG_RSHIFT) | (g<<PG_GSHIFT) | (b<<PG_BSHIFT))
+#define PGCOLORA(r,g,b,a) ((r<<PG_RSHIFT) | (g<<PG_GSHIFT) | (b<<PG_BSHIFT))
+
 typedef uint32_t pgcolor;
+
+//
+// Blend modes
+//
+enum PGBlendMode : uint8_t 
+{ 
+	OPAQUE = 0, 
+	ALPHA, 
+	ADDITIVE 
+};
 
 
 //
@@ -65,6 +90,21 @@ public:
 	const uint8_t * m_PixelData;
 };
 
+//
+// RGBA render target - image that can be drawn into - almost the same as PGImage but the pixel buffer is read-write
+//
+class PGRenderTarget
+{
+public:
+	PGRenderTarget() {}
+	PGRenderTarget(uint8_t * buffer, uint16_t w, uint16_t h) : m_Width(w),m_Height(h),m_PixelData(buffer) {}
+	int getStride() { return m_Width * 4; }
+	uint8_t * getPixelAddr(int x,int y) { return &m_PixelData[x*4 + y*m_Width*4]; }
+	
+	uint16_t m_Width = 0;
+	uint16_t m_Height = 0;
+	uint8_t * m_PixelData = nullptr;
+};
 
 //
 // PGApp objects are like little applications.  Your game or application will be launched when the user selects
