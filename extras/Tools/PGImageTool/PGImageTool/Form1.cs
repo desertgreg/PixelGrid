@@ -83,7 +83,6 @@ namespace PGImageTool
 
                 int bytecounter = 0;
                 int rowcounter = 0;
-                con.sbcpp.Append("\r\n\t");
 
                 for (int j=0; j<bitmap.Height; ++j)
                 {

@@ -100,11 +100,11 @@ public:
 		// framebuffer is 0xaarrggbb, first byte is b, then g,r,a
 		// first read src r,g,b and apply brightness compensation
 		uint8_t r,g,b,a;
-		b = (*src++ * g_drawBrightness)>>8;
-		g = (*src++ * g_drawBrightness)>>8;
-		r = (*src++ * g_drawBrightness)>>8;
+		b = (uint8_t)((uint16_t)(*src++ * g_drawBrightness)>>8);
+		g = (uint8_t)((uint16_t)(*src++ * g_drawBrightness)>>8);
+		r = (uint8_t)((uint16_t)(*src++ * g_drawBrightness)>>8);
 		a = (*src++);
-		uint8_t ainv = (uint8_t)(256-(int16_t)a);
+		uint8_t ainv = 255-a;
 		
 		// blend with existing data in the framebuffer
 		uint32_t tmp;
@@ -162,10 +162,15 @@ void PGGraphics::setBlendMode(PGBlendMode bm)
 void PGGraphics::setDrawBrightness(uint8_t bright)
 {
 	g_drawBrightness = bright;
+	
+	// neopixels are locking up if I go too bright!
+	if (g_drawBrightness > 128) g_drawBrightness = 128;
 }
 
 void PGGraphics::clear()
 {
+	SerialUSB.print(g_drawBrightness);
+	SerialUSB.print("\r\n");
 	for (int i=0; i<PIXEL_COUNT; ++i)
 	{
 		g_FrameBuffer.setPixelColor(i,0);

@@ -15,3 +15,4 @@ C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGIma
 C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Release\PGImageTool.csproj.CoreCompileInputs.cache
 C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Release\PGImageTool.exe
 C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Release\PGImageTool.pdb
+C:\Users\gregh\OneDrive\Documents\Arduino\libraries\PixelGrid\extras\Tools\PGImageTool\PGImageTool\obj\Release\PGImageTool.csprojAssemblyReference.cache
