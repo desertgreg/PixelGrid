@@ -4,8 +4,8 @@
 
 PGTransition::PGTransition()
 {
-	m_transColor = PGCOLOR(10,10,10);
-	m_transColor2 = PGCOLOR(5,5,5);
+	m_transColor = PGCOLOR(180,180,200);
+	m_transColor2 = PGCOLOR(80,80,90);
 }
 
 void PGTransition::start(PGTransitionVisual type)

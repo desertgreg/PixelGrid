@@ -169,8 +169,6 @@ void PGGraphics::setDrawBrightness(uint8_t bright)
 
 void PGGraphics::clear()
 {
-	SerialUSB.print(g_drawBrightness);
-	SerialUSB.print("\r\n");
 	for (int i=0; i<PIXEL_COUNT; ++i)
 	{
 		g_FrameBuffer.setPixelColor(i,0);
@@ -206,13 +204,13 @@ void PGGraphics::drawRow(int x0,int x1,int y, pgcolor color)
 	if (x1 >= 13) x1 = 12;
 	
 	// fill the row
-	uint8_t * dest = g_FrameBufferTarget.getPixelAddr(x0,y);
+	uint8_t * dst = g_FrameBufferTarget.getPixelAddr(x0,y);
 	uint8_t * src = (uint8_t*)&color;
 	
 	for (int i=0; i<x1-x0+1; ++i)
 	{
-		blend(dest,src);
-		*dest+=4;
+		blend(dst,src);
+		dst+=4;
 	}
 }
 
@@ -239,8 +237,12 @@ void PGGraphics::drawColumn(int x,int y0, int y1, pgcolor color)
 
 void PGGraphics::drawBox(int x0,int y0, int x1,int y1, pgcolor color)
 {
-	drawRow(x0,x1,y0,color);
-	drawRow(x0,x1,y1,color);
+	if (x0 > x1) { uint8_t tmp = x0; x0 = x1; x1 = tmp; }
+	if (x1 - x0 > 2)
+	{
+		drawRow(x0+1,x1-1,y0,color);
+		drawRow(x0+1,x1-1,y1,color);
+	}
 	drawColumn(x0,y0,y1,color);
 	drawColumn(x1,y0,y1,color);
 }
@@ -283,14 +285,13 @@ void PGGraphics::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color)
 	{
 		int mask = 0x80 >> src_x0;
 		int pixels = bmp.m_Pixels[src_y];
-		uint8_t * dst = g_FrameBufferTarget.getPixelAddr(dst_x0,j);
 
 		for (int i=dst_x0; i<dst_x1; ++i)
 		{
 			if (pixels & mask) 
 			{
+				uint8_t * dst = g_FrameBufferTarget.getPixelAddr(i,j);
 				blend(dst,src);
-				dst+=4;
 			}
 			mask = mask >> 1;
 		}

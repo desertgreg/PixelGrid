@@ -36,6 +36,8 @@ public:
 	void clear();
 	void fill(pgcolor color);
 	void setPixel(int x,int y,pgcolor color);
+	void drawRow(int x0,int x1,int y,pgcolor color);
+	void drawColumn(int x,int y0,int y1,pgcolor color);
 	void drawBox(int x0,int y0,int x1, int y1,pgcolor color);
 	void drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	void drawImage(int x, int y,PGImage & pmp);
@@ -69,6 +71,9 @@ inline void PixelGridController::setBrightness(uint8_t bright) { PGGraphics::set
 inline void PixelGridController::clear() { PGGraphics::clear(); }
 inline void PixelGridController::fill(pgcolor color) { PGGraphics::fill(color); }
 inline void PixelGridController::setPixel(int x,int y,pgcolor color) { PGGraphics::setPixel(x,y,color); }
+inline void PixelGridController::drawRow(int x0,int x1,int y,pgcolor color) { PGGraphics::drawRow(x0,x1,y,color); }
+inline void PixelGridController::drawColumn(int x,int y0,int y1,pgcolor color) { PGGraphics::drawRow(x,y0,y1,color); }
+
 inline void PixelGridController::drawBox(int x0,int y0,int x1, int y1,pgcolor color) { PGGraphics::drawBox(x0,y0,x1,y1,color); }
 inline void PixelGridController::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color) { PGGraphics::drawBitmap(x,y,bmp,color); }
 inline void PixelGridController::drawImage(int x, int y,PGImage & pmp) { PGGraphics::drawImage(x,y,pmp); }

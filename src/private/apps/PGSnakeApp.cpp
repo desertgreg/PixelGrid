@@ -1,7 +1,6 @@
 #include "PGSnakeApp.h"
 #include "PixelGrid.h"
 
-
 static int wrap(int val) { if (val < 0) return 12; if (val>12) return 0; return val; }
 static int random_pos() { return rand() % 13; }
 
@@ -42,8 +41,8 @@ void PGSnakeApp::start()
 	m_apples[1].m_flags = F_ALIVE;
 }
 
-#define APPLE_COLOR PGCOLOR(14,1,1)
-#define SNAKE_COLOR(i) PGCOLOR(5,12,5)
+#define APPLE_COLOR PGCOLOR(200,30,30)
+#define SNAKE_COLOR(i) PGCOLOR(64,190,50)
 
 
 void PGSnakeApp::checkNewHeadLocation(int x,int y)
@@ -164,7 +163,7 @@ void PGSnakeApp::update()
 
 
 
-PGBitmap8 & PGSnakeApp::getIcon()
+PGImage & PGSnakeApp::getIcon()
 {
-	return m_icon;
+	return IconSnakeImg;
 }

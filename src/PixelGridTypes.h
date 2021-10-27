@@ -59,7 +59,8 @@ enum PGBlendMode : uint8_t
 { 
 	OPAQUE = 0, 
 	ALPHA, 
-	ADDITIVE 
+	ADDITIVE,
+	SILHOUETTE
 };
 
 
@@ -115,7 +116,7 @@ class PGApp
 public:
 	virtual void start() = 0;
 	virtual void update() = 0;
-	virtual PGBitmap8 & getIcon() = 0;
+	virtual PGImage & getIcon() = 0;  // return a 13x13 icon
 };
 
 

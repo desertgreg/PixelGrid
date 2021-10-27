@@ -15,8 +15,6 @@ int wrap(int val)
 // system.  Then you can run your app by navigating to its icon through
 // the main menu.
 
-// Define an icon for your app
-PGBitmap8 paintBitmap(0x00,0x03,0x07,0x0e,0x1c,0x18,0xf0,0x00);
 
 // Implement an 'App' class which overrides the start, getIcon, and update functions:
 class MyPaintApp : public PGApp
@@ -27,9 +25,9 @@ public:
     PixelGrid.clear();  
   }
 
-  PGBitmap8 & getIcon() override
+  PGImage & getIcon() override
   {
-    return paintBitmap;    
+    return IconDefaultImg;  // TODO: make your own 13x13 icon image!
   }
   void update() override
   {
@@ -62,7 +60,7 @@ public:
     }
     
     // Draw a dot at x,y
-    PixelGrid.setPixel(x,y,PGCOLOR(10,3,4));
+    PixelGrid.setPixel(x,y,PGCOLOR(180,80,40));
   }
 
 public:

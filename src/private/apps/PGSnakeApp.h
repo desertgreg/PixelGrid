@@ -12,7 +12,7 @@ public:
 	PGSnakeApp();
 	void start() override;
 	void update() override;
-	PGBitmap8 & getIcon() override;
+	PGImage & getIcon() override;
 	
 protected:
 

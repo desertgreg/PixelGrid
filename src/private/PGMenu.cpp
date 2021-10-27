@@ -7,14 +7,10 @@
 #include "PixelGridTypes.h"
 #include "apps/PGSnakeApp.h"
 
-#define ICON_SIZE 8
-#define ICON_SPACING 11
+#define ICON_SIZE 13
+#define ICON_SPACING 13
 
  
-PGBitmap8 m_DogIcon(0x00,0x21,0x13,0x1f,0xe3,0xe3,0x22,0x66);
-PGBitmap8 m_FaceIcon(0x00,0x24,0x7e,0x5a,0x7e,0x66,0x18,0x00);
-PGBitmap8 m_BoxIcon(0xff,0x81,0x81,0x81,0x81,0x81,0x81,0xff);
-
 //
 // A mode to test out the menu system
 //
@@ -22,7 +18,7 @@ class TestAppClass : public PGApp
 {
 	void start() {}
 	void update() {}
-	PGBitmap8 & getIcon() { return m_FaceIcon; }
+	PGImage & getIcon() { return IconStopwatchImg; }
 };
 TestAppClass m_TestApp;
 
@@ -38,13 +34,8 @@ PGTransition m_transition;
 
 void PGMenu::setup()
 {
-	// add the default modes, 
-	m_apps[0] = &m_TestApp;
-	m_apps[1] = &m_TestApp;
-	m_apps[2] = &m_TestApp;
-	m_apps[3] = &m_TestApp;
-	m_appCount = 4;
-
+	// add the default apps, 
+	addApp(m_TestApp);
 	PGSnakeApp * snake = new PGSnakeApp;
 	addApp(*snake);
 	
@@ -52,27 +43,29 @@ void PGMenu::setup()
 	m_menuScroller.setSpeed(256);
 }
 
-const pgcolor ICON_COLOR = PGCOLOR(8,8,14);
+const pgcolor ICON_COLOR = PGCOLOR(100,100,200);
 
 void PGMenu::draw_icons(bool blink)
 {
 	// scroller goes from 0 to num_apps * icon_spacing
 	// so you can think of it as a 'camera position' moving along the
 	// row of icons.  To draw the icons, negate the position and offset a little
-	int x = 2 - m_menuScroller.get();
-	
+	int x = -m_menuScroller.get();
 	for (int i=0;i<m_appCount; ++i)
 	{
 		if (blink && i == m_selectedApp)
 		{
-			PGGraphics::drawBitmapInvert(x,2,m_apps[i]->getIcon(),ICON_COLOR);
+			PGGraphics::setBlendMode(SILHOUETTE);
+			PGGraphics::drawImage(x,0,m_apps[i]->getIcon());
 		}
 		else
 		{
-			PGGraphics::drawBitmap(x,2,m_apps[i]->getIcon(),ICON_COLOR);
+			PGGraphics::setBlendMode(OPAQUE);
+			PGGraphics::drawImage(x,0,m_apps[i]->getIcon());
 		}
 		x = x + ICON_SPACING;
 	}
+	PGGraphics::setBlendMode(OPAQUE);
 }
 
 void PGMenu::update_normal()
