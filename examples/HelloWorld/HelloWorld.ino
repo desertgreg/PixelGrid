@@ -2,48 +2,16 @@
 #include "PixelGrid.h"
 
 
-// variables for this sketch
-int x = 6;
-int y = 6;
-
-
 void setup() 
 {
-  SerialUSB.begin(115200);
   PixelGrid.setup();
 }
 
-int wrap(int val) 
+void loop() 
 {
-  if (val<0) val=12;
-  if (val>12) val=0;
-  return val;
-}
-
-void hello_world()
-{
-  // Use the buttons to move x,y around the screen
-  if (PixelGrid.wasPressed(PGButton::U))
-  {
-    y=y-1;
-    y=wrap(y);
-  }
-  if (PixelGrid.wasPressed(PGButton::D))
-  {
-    y=y+1;
-    y=wrap(y);
-  }
-  if (PixelGrid.wasPressed(PGButton::L))
-  {
-    x=x-1;
-    x=wrap(x);
-  }
-  if (PixelGrid.wasPressed(PGButton::R))
-  {
-    x=x+1;
-    x=wrap(x);
-  }
-
+  // clear the screen
+  PixelGrid.clear();
+  
   // Play a sound if A is pressed
   if (PixelGrid.wasPressed(PGButton::A))
   {
@@ -51,13 +19,7 @@ void hello_world()
   }
   
   // Draw a dot at x,y
-  PixelGrid.setPixel(x,y,PGCOLOR(190,64,20));
-}
-
-void loop() 
-{
-  // Clear the screen, update your game logic, draw the new frame.
-  hello_world();
+  PixelGrid.setPixel(6,6,PGCOLOR(190,64,20));
 
   // When you're done with the logic for a frame, let the system update
   PixelGrid.update();
