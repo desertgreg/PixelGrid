@@ -9,10 +9,10 @@
 void setup() {
   PixelGrid.setup();
   SerialUSB.begin(114200);
-  while (!SerialUSB);
+  //while (!SerialUSB);
 }
 
-const pgcolor ONCOLOR = PGCOLOR(10,7,3);
+const pgcolor ONCOLOR = PGCOLOR(180,80,50);
 
 void loop() {
   PixelGrid.clear();

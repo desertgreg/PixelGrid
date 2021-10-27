@@ -76,7 +76,7 @@ void test_sounds()
   {
     PixelGrid.playSound(*sounds[cursor]);
   }
-  PixelGrid.fill(PGCOLOR(0,0,10));//0,0,0x00001000); //PGCOLOR(10,0,0));
+  PixelGrid.fill(PGCOLOR(0,0,190));
 }
 
 ////////////////////////////////////////////////////////
@@ -92,12 +92,12 @@ void test_images()
 ////////////////////////////////////////////////////////
 // Sinewave
 ////////////////////////////////////////////////////////
-int min_val = 2<<4;
-int max_val = 8<<4;
+int min_val = 20<<4;
+int max_val = 200<<4;
 
-int start_r = 5<<4;
-int start_g = 2<<4;
-int start_b = 6<<4;
+int start_r = 50<<4;
+int start_g = 20<<4;
+int start_b = 60<<4;
 
 int inc_channel(int val)
 {
@@ -129,6 +129,8 @@ void sinewave()
   bool flash = PixelGrid.isDown(PGButton::B);
   
   PixelGrid.clear();
+  PixelGrid.drawImage(-x,-y,PixelGridImg);
+
   phase++;
   for (int i=0; i<13; ++i)
   {
@@ -137,9 +139,9 @@ void sinewave()
     int yval = (int)y;
     PixelGrid.setPixel(i,yval,PGCOLOR(start_r>>4,start_g>>4,start_b>>4));
     
-    int r2 = start_r-8;
-    int g2 = start_g-8;
-    int b2 = start_b-8;
+    int r2 = start_r-32;
+    int g2 = start_g-23;
+    int b2 = start_b-32;
     for (int c=yval+1;c<13; ++c)
     {
       PixelGrid.setPixel(i,c,PGCOLOR(r2>>4,g2>>4,b2>>4));
@@ -155,7 +157,6 @@ void sinewave()
       if (b2 < 0) b2 = 0;
     }
   }
-  PixelGrid.drawImage(-x,-y,PixelGridImg);
   
   if (PixelGrid.wasPressed(PGButton::U)) amplitude += 0.2f;
   if (PixelGrid.wasPressed(PGButton::D)) amplitude -= 0.2f;
@@ -170,7 +171,7 @@ void sinewave()
 ////////////////////////////////////////////////////////
 int random_coord() { return (rand() % 13) << 4; }
 int random_vel() { return (rand() % 7); }
-pgcolor random_color() { int r=rand() &15; int g=rand()&15; int b=rand()&15; return PGCOLOR(r,g,b); }
+pgcolor random_color() { int r=rand() & 0x7f; int g=rand()&0x7f; int b=rand()&0x7f; return PGCOLOR(r,g,b); }
 
 struct bouncer
 {

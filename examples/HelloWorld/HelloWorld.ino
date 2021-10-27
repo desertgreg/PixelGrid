@@ -51,7 +51,7 @@ void hello_world()
   }
   
   // Draw a dot at x,y
-  PixelGrid.setPixel(x,y,PGCOLOR(10,3,4));
+  PixelGrid.setPixel(x,y,PGCOLOR(190,64,20));
 }
 
 void loop() 
