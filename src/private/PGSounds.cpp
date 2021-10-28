@@ -15,12 +15,17 @@ uint8_t s_DmaBuffer1[4096];
 
 struct ActiveSoundStruct
 {
-	const uint8_t * m_Data;
-	uint16_t m_Size;
-	uint16_t m_Cursor;
+	const uint8_t * m_Data = nullptr;
+	uint32_t m_Size = 0;			// size in bytes of the sound
+	uint32_t m_Cursor = 0;			// 7bits of fraciton
+	uint8_t m_Active = 0;
+	uint8_t m_Volume = 0xFF; 			// 0xFF = 1.0 
+	uint8_t m_PlaybackRate = 0x80; 	// 0x80 = normal
+	uint8_t m_Loop = 0;
 };
 
-ActiveSoundStruct s_ActiveSound;
+static const int SOUND_CHANNEL_COUNT = 2;
+ActiveSoundStruct s_ActiveSounds[SOUND_CHANNEL_COUNT];
 
 
 
@@ -29,14 +34,36 @@ ActiveSoundStruct s_ActiveSound;
 //  Sound Engine Implementation
 //
 /////////////////////////////////////////////////////
+inline uint8_t Update_Channel(ActiveSoundStruct & s)
+{
+	uint16_t sample = s.m_Data[s.m_Cursor>>7];
+	s.m_Cursor += s.m_PlaybackRate;
+	if (s.m_Cursor>>7 >= s.m_Size)
+	{
+		s.m_Cursor = 0;
+		if (s.m_Loop == 0)
+		{
+			s.m_Active = 0;
+		}
+	}
+	
+	sample = (sample * s.m_Volume) >> 8;
+	return (uint8_t)sample;
+}
 
 void TC5_Update()
 {
-	if (s_ActiveSound.m_Cursor < s_ActiveSound.m_Size)
+	uint16_t accumulator = 0;
+	
+	for (int i=0; i<SOUND_CHANNEL_COUNT; ++i)
 	{
-		s_ActiveSound.m_Cursor++;
-		DAC->DATA.reg = s_ActiveSound.m_Data[s_ActiveSound.m_Cursor];
+		if (s_ActiveSounds[i].m_Active)
+		{
+			accumulator += Update_Channel(s_ActiveSounds[i]);
+		}
 	}
+
+	DAC->DATA.reg = accumulator >> 1;  //Must change this if we change SOUND_CHANNEL_COUNT
 }
 
 // Interrupt handler for TC5
@@ -105,10 +132,37 @@ void PGSounds::update()
 	// don't have to do anything here, everything is in the hardware timer interrupt
 }
 
-void PGSounds::play(PGSound & sound)
+void PGSounds::setChannelPlaybackRate(uint8_t channel,uint8_t rate)
 {
-	s_ActiveSound.m_Data = sound.m_Data;
-	s_ActiveSound.m_Size = sound.m_Size;
-	s_ActiveSound.m_Cursor = 0;
+	if ((channel < 0) || (channel >= SOUND_CHANNEL_COUNT)) 
+	{
+		return;
+	}
+	s_ActiveSounds[channel].m_PlaybackRate = rate;
 }
+
+void PGSounds::setChannelVolume(uint8_t channel,uint8_t volume)
+{
+	if ((channel < 0) || (channel >= SOUND_CHANNEL_COUNT)) 
+	{
+		return;
+	}
+	s_ActiveSounds[channel].m_Volume = volume;
+}
+
+void PGSounds::play(PGSound & sound,uint8_t channel,uint8_t playback_rate, uint8_t loop)
+{
+	if ((channel < 0) || (channel >= SOUND_CHANNEL_COUNT)) 
+	{
+		return;
+	}
+	
+	s_ActiveSounds[channel].m_Data = sound.m_Data;
+	s_ActiveSounds[channel].m_Size = sound.m_Size;
+	s_ActiveSounds[channel].m_Cursor = 0;
+	s_ActiveSounds[channel].m_PlaybackRate = playback_rate;
+	s_ActiveSounds[channel].m_Loop = loop;
+	s_ActiveSounds[channel].m_Active = 1;
+}
+
 
