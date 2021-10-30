@@ -26,10 +26,10 @@ enum PGButton : uint8_t
 class PGSound
 {
 public:
-	PGSound(const uint8_t * data,uint16_t size) : m_Size(size), m_Data(data) {}
+	PGSound(const int8_t * data,uint32_t size) : m_Size(size), m_Data(data) {}
 	
-	uint16_t m_Size;
-	const uint8_t * m_Data;
+	uint32_t m_Size;
+	const int8_t * m_Data;
 };
 
 

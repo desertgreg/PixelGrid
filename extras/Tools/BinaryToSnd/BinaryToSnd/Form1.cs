@@ -53,12 +53,12 @@ namespace BinaryToSnd
             con.sbh.Append("#ifndef " + con.Header_Guard() + "\r\n");
             con.sbh.Append("#define " + con.Header_Guard() + "\r\n\r\n");
 
-            con.sbh.Append("#include \"PGSounds.h\"\r\n\r\n");
+            con.sbh.Append("#include \"PixelGridTypes.h\"\r\n\r\n");
         }
 
         void Write_Sound_Preamble(CodeGenContext con,string soundname)
         {
-            con.sbcpp.Append("static const uint8_t " + con.Array_Name(soundname) + "[] = {\r\n");
+            con.sbcpp.Append("static const int8_t " + con.Array_Name(soundname) + "[] = {\r\n");
             con.sbh.Append("extern PGSound " + con.Obj_Name(soundname) + ";\r\n");
         }
 
@@ -78,14 +78,16 @@ namespace BinaryToSnd
                 
                 
                 // open the file and read into memory
-                byte[] filedata = File.ReadAllBytes(soundname);
+                byte[] filedataraw = File.ReadAllBytes(soundname);
+                sbyte[] filedata = (sbyte[])(Array)filedataraw;
 
                 int bytecounter = 0;
                 int rowcounter = 0;
                 con.sbcpp.Append("\r\n\t");
-                foreach (byte b in filedata)
+                foreach (sbyte b in filedata)
                 {
-                    con.sbcpp.Append("0x" + Convert.ToString(b, 16).PadLeft(2, '0'));
+                    //con.sbcpp.Append("0x" + Convert.ToString(b, 16).PadLeft(2, '0'));
+                    con.sbcpp.Append(Convert.ToString(b));
 
                     // comma after every byte unless last byte
                     bytecounter++;

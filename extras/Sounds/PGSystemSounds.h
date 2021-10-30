@@ -1,7 +1,7 @@
 #ifndef PGSYSTEMSOUNDS_H
 #define PGSYSTEMSOUNDS_H
 
-#include "PGSounds.h"
+#include "PixelGridTypes.h"
 
 extern PGSound BossAppearSnd;
 extern PGSound EnterProgramSnd;

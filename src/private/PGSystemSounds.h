@@ -15,5 +15,6 @@ extern PGSound PixelgridStartupSnd;
 extern PGSound SwooshSnd;
 extern PGSound TakeDamageSnd;
 extern PGSound TestSoundSnd;
+extern PGSound TestToneSnd;
 
 #endif //PGSYSTEMSOUNDS_H

@@ -15,7 +15,7 @@ uint8_t s_DmaBuffer1[4096];
 
 struct ActiveSoundStruct
 {
-	const uint8_t * m_Data = nullptr;
+	const int8_t * m_Data = nullptr;
 	uint32_t m_Size = 0;			// size in bytes of the sound
 	uint32_t m_Cursor = 0;			// 7bits of fraciton
 	uint8_t m_Active = 0;
@@ -34,9 +34,9 @@ ActiveSoundStruct s_ActiveSounds[SOUND_CHANNEL_COUNT];
 //  Sound Engine Implementation
 //
 /////////////////////////////////////////////////////
-inline uint8_t Update_Channel(ActiveSoundStruct & s)
+inline int16_t Update_Channel(ActiveSoundStruct & s)
 {
-	uint16_t sample = s.m_Data[s.m_Cursor>>7];
+	int16_t sample = s.m_Data[s.m_Cursor>>7];
 	s.m_Cursor += s.m_PlaybackRate;
 	if (s.m_Cursor>>7 >= s.m_Size)
 	{
@@ -48,12 +48,12 @@ inline uint8_t Update_Channel(ActiveSoundStruct & s)
 	}
 	
 	sample = (sample * s.m_Volume) >> 8;
-	return (uint8_t)sample;
+	return sample;
 }
 
 void TC5_Update()
 {
-	uint16_t accumulator = 0;
+	int16_t accumulator = 0;
 	
 	for (int i=0; i<SOUND_CHANNEL_COUNT; ++i)
 	{
@@ -63,7 +63,13 @@ void TC5_Update()
 		}
 	}
 
-	DAC->DATA.reg = accumulator >> 1;  //Must change this if we change SOUND_CHANNEL_COUNT
+	// convert to unsigned and clamp
+	//accumulator += 128;
+	//if (accumulator > 128) accumulator = 128;
+	//if (accumulator < 0) accumulator = 0;
+	int16_t unsigned_accum = accumulator + 128;
+	
+	DAC->DATA.reg = (uint8_t)unsigned_accum;
 }
 
 // Interrupt handler for TC5
