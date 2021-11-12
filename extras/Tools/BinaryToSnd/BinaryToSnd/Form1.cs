@@ -81,13 +81,17 @@ namespace BinaryToSnd
                 byte[] filedataraw = File.ReadAllBytes(soundname);
                 sbyte[] filedata = (sbyte[])(Array)filedataraw;
 
+                // Record the size of the data so we can leave a comment in the code for it
+                con.m_ByteCount = filedata.Length;
+
                 int bytecounter = 0;
                 int rowcounter = 0;
-                con.sbcpp.Append("\r\n\t");
+                con.sbcpp.Append("\t");
+
                 foreach (sbyte b in filedata)
                 {
                     //con.sbcpp.Append("0x" + Convert.ToString(b, 16).PadLeft(2, '0'));
-                    con.sbcpp.Append(Convert.ToString(b));
+                    con.sbcpp.Append(Convert.ToString(b).PadLeft(4,' '));
 
                     // comma after every byte unless last byte
                     bytecounter++;
@@ -117,7 +121,15 @@ namespace BinaryToSnd
         void Write_Sound_Postamble(CodeGenContext con,string soundname,int bytes)
         {
             con.sbcpp.Append("};\r\n");
-            con.sbcpppost.Append("PGSound " + con.Obj_Name(soundname) + "(" + con.Array_Name(soundname) + ",sizeof(" + con.Array_Name(soundname) + "));\r\n");
+
+            // Write comment indicating the size of the data:
+            con.sbcpp.Append("// byte count = " + con.m_ByteCount.ToString() + "\r\n");
+
+            // detect  '8K,16K,32K suffixes' and automatically add the sample rate parameter (default to 8K)
+            string sample_rate = con.Get_Sample_Rate_String(soundname);
+            
+            // write the PGSound object declaration:
+            con.sbcpppost.Append("PGSound " + con.Obj_Name(soundname) + "(" + con.Array_Name(soundname) + ",sizeof(" + con.Array_Name(soundname) + "),"+sample_rate+");\r\n");
         }
         void Write_File_Postamble(CodeGenContext con,string filename)
         {

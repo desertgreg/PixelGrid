@@ -20,16 +20,30 @@ enum PGButton : uint8_t
 	BCOUNT
 };
 
+
+
+enum PGSoundSampleRate
+{
+	PG_SAMPLERATE_1KHZ = 0,
+	PG_SAMPLERATE_2KHZ,
+	PG_SAMPLERATE_4KHZ,
+	PG_SAMPLERATE_8KHZ,
+	PG_SAMPLERATE_16KHZ,	// future support, do not use (yet)
+	PG_SAMPLERATE_32KHZ,	// future support, do not use (yet)
+};
+
 //
 // Sound effect definition
 //
 class PGSound
 {
 public:
-	PGSound(const int8_t * data,uint32_t size) : m_Size(size), m_Data(data) {}
+	PGSound(const int8_t * data,uint32_t size) : m_Size(size), m_Data(data),m_SampleRate(PG_SAMPLERATE_4KHZ) {}
+	PGSound(const int8_t * data,uint32_t size,PGSoundSampleRate rate) : m_Size(size), m_Data(data),m_SampleRate(rate) {}
 	
 	uint32_t m_Size;
 	const int8_t * m_Data;
+	PGSoundSampleRate m_SampleRate;
 };
 
 

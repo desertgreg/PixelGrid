@@ -15,7 +15,7 @@ public:
 
 	static void setChannelVolume(uint8_t channel,uint8_t volume);
 	static void setChannelPlaybackRate(uint8_t channel,uint8_t rate);
-	static void play(PGSound & sound,uint8_t channel = 0,uint8_t playback_rate = 0x7F, uint8_t loop = 0);
+	static void play(PGSound & sound,uint8_t channel = 0,uint8_t loop = 0);
 
 };
 

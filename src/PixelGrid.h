@@ -28,8 +28,7 @@ public:
 	
 	// Sound
 	void setChannelVolume(uint8_t channel,uint8_t volume);
-	void setChannelPlaybackRate(uint8_t channel,uint8_t rate);
-	void playSound(PGSound & sound,uint8_t channel = 0,uint8_t playback_rate = 0x7F, uint8_t loop = 0);
+	void playSound(PGSound & sound,uint8_t channel = 0,uint8_t loop = 0);
 
 	// Graphics
 	void setBlendMode(PGBlendMode bm);
@@ -67,8 +66,7 @@ inline uint8_t PixelGridController::wasPressed(PGButton b) { return PGButtons::w
 inline uint8_t PixelGridController::wasReleased(PGButton b) { return PGButtons::wasReleased(b); }
 
 inline void PixelGridController::setChannelVolume(uint8_t channel,uint8_t volume) { PGSounds::setChannelVolume(channel,volume); }
-inline void PixelGridController::setChannelPlaybackRate(uint8_t channel,uint8_t rate) { PGSounds::setChannelPlaybackRate(channel,rate); }
-inline void PixelGridController::playSound(PGSound & sound,uint8_t channel,uint8_t playback_rate, uint8_t loop) { PGSounds::play(sound,channel,playback_rate,loop); }
+inline void PixelGridController::playSound(PGSound & sound,uint8_t channel,uint8_t loop) { PGSounds::play(sound,channel,loop); }
 
 inline void PixelGridController::setBlendMode(PGBlendMode bm) { PGGraphics::setBlendMode(bm); }
 inline void PixelGridController::setBrightness(uint8_t bright) { PGGraphics::setDrawBrightness(bright); }

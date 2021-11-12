@@ -1,6 +1,7 @@
 #include "PGSounds.h"
 
-
+// Enable this and attach a probe to the UART RX pin to measure the diming and duty cycle of the sound interrupt
+#define SCOPE_TIMING 01
 
 
 /////////////////////////////////////////////////////
@@ -17,16 +18,32 @@ struct ActiveSoundStruct
 {
 	const int8_t * m_Data = nullptr;
 	uint32_t m_Size = 0;			// size in bytes of the sound
-	uint32_t m_Cursor = 0;			// 7bits of fraciton
+	uint32_t m_Cursor = 0;			// 8bits of fraciton
 	uint8_t m_Active = 0;
 	uint8_t m_Volume = 0xFF; 			// 0xFF = 1.0 
-	uint8_t m_PlaybackRate = 0x80; 	// 0x80 = normal
+	PGSoundSampleRate m_SampleRate = PG_SAMPLERATE_4KHZ; // sampling rate of the data
+	//uint8_t m_PlaybackRate = 0x80; 	// future, maybe allow for faster/slower playback (pitch changing)
+	uint16_t m_PlaybackIncrement;  // 8bits of fraction, 32Khz clock
 	uint8_t m_Loop = 0;
 };
 
 static const int SOUND_CHANNEL_COUNT = 2;
 ActiveSoundStruct s_ActiveSounds[SOUND_CHANNEL_COUNT];
 
+
+static void debug_channel(int c)
+{
+	SerialUSB.print("c[");
+	SerialUSB.print(c);
+	SerialUSB.print("] size=");
+	SerialUSB.print(s_ActiveSounds[c].m_Size);
+	SerialUSB.print(" cursor=");
+	SerialUSB.print(s_ActiveSounds[c].m_Cursor);
+	SerialUSB.print(" increment=");
+	SerialUSB.print(s_ActiveSounds[c].m_PlaybackIncrement);
+	SerialUSB.print("\r\n");
+}
+	
 
 
 /////////////////////////////////////////////////////
@@ -36,9 +53,9 @@ ActiveSoundStruct s_ActiveSounds[SOUND_CHANNEL_COUNT];
 /////////////////////////////////////////////////////
 inline int16_t Update_Channel(ActiveSoundStruct & s)
 {
-	int16_t sample = s.m_Data[s.m_Cursor>>7];
-	s.m_Cursor += s.m_PlaybackRate;
-	if (s.m_Cursor>>7 >= s.m_Size)
+	int16_t sample = s.m_Data[s.m_Cursor>>8];
+	s.m_Cursor += s.m_PlaybackIncrement;
+	if (s.m_Cursor>>8 >= s.m_Size)
 	{
 		s.m_Cursor = 0;
 		if (s.m_Loop == 0)
@@ -63,21 +80,20 @@ void TC5_Update()
 		}
 	}
 
-	// convert to unsigned and clamp
-	//accumulator += 128;
-	//if (accumulator > 128) accumulator = 128;
-	//if (accumulator < 0) accumulator = 0;
-	int16_t unsigned_accum = accumulator + 128;
+	// convert to 0..255, clamp and send to DAC
+	int16_t sample = accumulator + 128;
+	if (sample > 255) sample = 255;
+	if (sample < 0) sample = 0;
 	
-	DAC->DATA.reg = (uint8_t)unsigned_accum;
+	DAC->DATA.reg = (uint8_t)sample;
 }
 
 // Interrupt handler for TC5
 void TC5_Handler()
 {
-	//static int toggle;
-	//toggle = !toggle;
-	//digitalWrite(0,toggle);
+#if SCOPE_TIMING
+	digitalWrite(0,1);
+#endif
 
 	//if (TC->INTFLAG.bit.MC0 == 1) {  // A compare to cc0 caused the interrupt
 	//  TC->INTFLAG.bit.MC0 = 1;    // writing a one clears the flag ovf flag
@@ -89,6 +105,10 @@ void TC5_Handler()
 	}
 
 	TC5_Update();
+
+#if SCOPE_TIMING
+	digitalWrite(0,0);
+#endif
 }
 
 
@@ -106,7 +126,7 @@ void PGSounds::setup()
 	while (GCLK->STATUS.bit.SYNCBUSY);
 
 	//Configure Divisor of Input Clock for GENCTRL(GENDIV Related Settings)
-	GCLK->GENDIV.reg = GCLK_GENDIV_DIV(48) |         //Select clock divisor as 48 i.e GCLK4 output will be 48/48 = 1MHz
+	GCLK->GENDIV.reg = GCLK_GENDIV_DIV(3) |      //Clock Divisor, CPU=48Mhz so 48divisor=1Mhz  24divisor=2Mhz, 12divisor=4Mhz, CHOOSING 3->16Mhz timer
 					 GCLK_GENDIV_ID(4);           //GCLK4
 
 	//Now configure GCLK4 & Feed it's output to TC5(CLKCTRL related settings)
@@ -119,7 +139,23 @@ void PGSounds::setup()
 						   TC_CTRLA_PRESCALER_DIV1 | //1024  | //1024 Prescaler
 						   TC_CTRLA_WAVEGEN_MFRQ;  //Match Frequency Mode
 
-	TC5->COUNT16.CC[0].reg = 200; //250;// Set the CC register
+	// If clock Divisor above is 48 (1Mhz clock) Then:
+	// CC = 248 = 4.015KHz
+	// CC = 200 = 4.975KHz
+	// CC = 124 = 8.001KHz
+	// CC = 61  = 16.130KHz
+	// CC = 30  = 32.255KHz
+	
+	// We selected clock divisor of 3 (16Mhz clock) Then:
+	// CC = 4000 = 3.999Khz
+	// CC = 2000 = 8Khz
+	// CC = 1000 = 16Khz
+	// CC = 499 = 32Khz
+	
+	// I chose 8Khz playback because until I have some form of sound compression, anything
+	// higher than that is too wasteful.  At 8kHz, you only get 13s of sound samples before
+	// you run out of RAM!
+	TC5->COUNT16.CC[0].reg = 2000; //499; //250;// Set the CC register
 	while (TC5->COUNT16.STATUS.bit.SYNCBUSY);
 
 	TC5->COUNT16.CTRLA.bit.ENABLE = 1;  //Enable TC5
@@ -131,20 +167,17 @@ void PGSounds::setup()
 	NVIC_EnableIRQ(TC5_IRQn);
 
 	TC5->COUNT16.INTENSET.bit.OVF = 1;
+	
+#if SCOPE_TIMING
+	pinMode(0,OUTPUT);
+#endif
 }
 
 void PGSounds::update()
 {
 	// don't have to do anything here, everything is in the hardware timer interrupt
-}
-
-void PGSounds::setChannelPlaybackRate(uint8_t channel,uint8_t rate)
-{
-	if ((channel < 0) || (channel >= SOUND_CHANNEL_COUNT)) 
-	{
-		return;
-	}
-	s_ActiveSounds[channel].m_PlaybackRate = rate;
+	//if (s_ActiveSounds[0].m_Active)
+	//	debug_channel(0);
 }
 
 void PGSounds::setChannelVolume(uint8_t channel,uint8_t volume)
@@ -156,19 +189,40 @@ void PGSounds::setChannelVolume(uint8_t channel,uint8_t volume)
 	s_ActiveSounds[channel].m_Volume = volume;
 }
 
-void PGSounds::play(PGSound & sound,uint8_t channel,uint8_t playback_rate, uint8_t loop)
+void PGSounds::play(PGSound & sound,uint8_t channel,uint8_t loop)
 {
+	SerialUSB.print("play\r\n");
 	if ((channel < 0) || (channel >= SOUND_CHANNEL_COUNT)) 
 	{
+		SerialUSB.print("a\r\n");
 		return;
 	}
 	
 	s_ActiveSounds[channel].m_Data = sound.m_Data;
 	s_ActiveSounds[channel].m_Size = sound.m_Size;
 	s_ActiveSounds[channel].m_Cursor = 0;
-	s_ActiveSounds[channel].m_PlaybackRate = playback_rate;
+	//s_ActiveSounds[channel].m_PlaybackRate = playback_rate;
 	s_ActiveSounds[channel].m_Loop = loop;
+
+	// TODO: could let the user select the playback rate of the sound engine and 
+	// adjust these step values accordingly.  That might mean if they play a 32K sample
+	// and the rate is lower, the system could skip samples.  For now, I'll just leave
+	// the timer interrupt at 32Khz but it uses about 13% of the CPU time.
+	static uint16_t s_Increments[] = 
+	{
+		255/8,	//PG_SAMPLERATE_1KHZ
+		255/4,
+		255/2,
+		255,
+		255*2,	//PG_SAMPLERATE_16KHZ
+		255*4	//PG_SAMPLERATE_32KHZ
+	};
+	s_ActiveSounds[channel].m_PlaybackIncrement = s_Increments[sound.m_SampleRate];
 	s_ActiveSounds[channel].m_Active = 1;
+	
+	debug_channel(channel);
+	
 }
+
 
 
