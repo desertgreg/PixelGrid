@@ -29,7 +29,7 @@ public:
 	static void drawImage(int x, int y,PGImage & img);
 	static void drawImage2(int x, int y,PGImage & img);
 	static void drawDigit(int x, int y, int digit);
-
+	static void drawNumber(int x,int y, int number);
 	
 private:
 	static void clipImage(int x, int y,PGImage & img);

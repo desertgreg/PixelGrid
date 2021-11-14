@@ -70,6 +70,7 @@ public:
 
 typedef uint32_t pgcolor;
 
+
 //
 // Blend modes
 //

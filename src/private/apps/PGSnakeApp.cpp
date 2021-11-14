@@ -258,6 +258,7 @@ void PGSnakeApp::init_lost()
 	m_stateCounter = 0;
 	PixelGrid.playSound(TakeDamageSnd);
 	m_blowUpCounter = 130;
+	m_score = 0;
 }
 
 void PGSnakeApp::update_lost()
@@ -276,15 +277,29 @@ void PGSnakeApp::update_lost()
 		m_blowUpCounter = 10;
 		if (m_snakeSegs > 0)
 		{
+			m_score++;
 			m_snakeSegs--;
 			PixelGrid.playSound(TakeDamageSnd);
 		}
 		else
 		{
-			init_starting();
+			if (PixelGrid.anyPressed())
+			{
+				init_starting();
+			}
 		}
 	}
-	
+	int tmp = m_score;
+	int h = tmp / 100;
+	tmp = tmp - h*100;
+	int t = tmp / 10;
+	tmp = tmp - t*10;
+	int o = tmp;
+	PixelGrid.setBlendMode(PGBlendMode::ALPHA);
+	PixelGrid.drawDigit(1,3,h);
+	PixelGrid.drawDigit(5,3,t);
+	PixelGrid.drawDigit(9,3,o);
+	PixelGrid.resetRenderStates();
 }
 
 void PGSnakeApp::update()

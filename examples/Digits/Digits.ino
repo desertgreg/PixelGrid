@@ -8,11 +8,17 @@ void setup() {
 int counter = 0;
 int val = 0;
 
-int clamp_digit(int val)
+
+void draw_background()
 {
-  if (val < 0) val = 0;
-  if (val > 9) val = 9;
-  return val;
+  pgcolor c0 = PGCOLOR(255,0,33);
+  pgcolor c1 = PGCOLOR(33,0,255);
+  pgcolor c;
+  for (int i=0;i<13;++i)
+  {
+    c = PixelGrid.interpolateColors(c0,c1,(255*i)/12);
+    PixelGrid.drawBox(i,0,i,12,c);
+  }
 }
 
 void loop() {
@@ -27,16 +33,24 @@ void loop() {
     counter = 0;
   }
 
-  int tmp = val;
-  int hundreds = clamp_digit(tmp / 100);
-  tmp -= hundreds * 100;
-  int tens = clamp_digit(tmp / 10);
-  tmp -= tens * 10;
-  int ones = clamp_digit(tmp);
+  draw_background();
 
-  PixelGrid.drawDigit(0,0,hundreds);
-  PixelGrid.drawDigit(4,0,tens);
-  PixelGrid.drawDigit(8,0,ones);
+  // pingpong counter 0..255..0..255, etc
+  static uint16_t counter = 0;
+  counter++;
+  if (counter > 2*255<<4) counter = 0;
+  int t = counter>>4;
+  if (t > 255) t = 255 - (counter - 255);
+  
+  float g = 80.0f + 80.0f*sin(t);
+  pgcolor c0 = PGCOLORA(255,160,64,255);
+  pgcolor c1 = PGCOLORA(180,48,64,255);
+  pgcolor c = PixelGrid.interpolateColors(c0,c1,t);
+  
+  PixelGrid.setTint(PGCOLORA(0,(int)g,0,255));
+  PixelGrid.setBlendMode(PGBlendMode::ALPHA);
+  
+  PixelGrid.drawNumber(1,4,val);
 
   PixelGrid.update();
 }
