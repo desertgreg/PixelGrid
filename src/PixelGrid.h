@@ -42,7 +42,7 @@ public:
 	void drawBox(int x0,int y0,int x1, int y1,pgcolor color);
 	void drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	void drawImage(int x, int y,PGImage & pmp);
-	void drawImage2(int x, int y,PGImage & pmp);
+	void drawDigit(int x, int y, int digit);
 	
 	// Apps (optional, enables a menu and multiple applications, add your game using 'addApp')
 	void enableApps(bool onoff = true);
@@ -79,7 +79,8 @@ inline void PixelGridController::drawColumn(int x,int y0,int y1,pgcolor color) {
 inline void PixelGridController::drawBox(int x0,int y0,int x1, int y1,pgcolor color) { PGGraphics::drawBox(x0,y0,x1,y1,color); }
 inline void PixelGridController::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color) { PGGraphics::drawBitmap(x,y,bmp,color); }
 inline void PixelGridController::drawImage(int x, int y,PGImage & pmp) { PGGraphics::drawImage(x,y,pmp); }
-inline void PixelGridController::drawImage2(int x, int y,PGImage & pmp) { PGGraphics::drawImage2(x,y,pmp); }
+inline void PixelGridController::drawDigit(int x, int y, int digit) { PGGraphics::drawDigit(x,y,digit); }
+
 
 
 #endif //PIXELGRID_H

@@ -26,6 +26,8 @@ public:
 	static void drawBitmapInvert(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	static void drawImage(int x, int y,PGImage & img);
 	static void drawImage2(int x, int y,PGImage & img);
+	static void drawDigit(int x, int y, int digit);
+
 	
 private:
 	static void clipImage(int x, int y,PGImage & img);

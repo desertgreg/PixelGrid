@@ -3,7 +3,7 @@
 #include <SamD.h>
 #include "PGGraphics.h"
 #include "private/PGFrameBuffer.h"
-
+#include "private/PGSystemImages.h"
 
 #define USE_ADAFRUIT 0
 #define PIXEL_PIN   12 
@@ -485,3 +485,24 @@ void PGGraphics::drawImage2(int x, int y,PGImage & img)
         src_y++;
     }
 }
+
+void PGGraphics::drawDigit(int x, int y, int digit)
+{
+	static PGImage * digits[10] = 
+	{
+	  &Digit0Img,
+	  &Digit1Img,
+	  &Digit2Img,
+	  &Digit3Img,
+	  &Digit4Img,
+	  &Digit5Img,
+	  &Digit6Img,
+	  &Digit7Img,
+	  &Digit8Img,
+	  &Digit9Img
+	};
+	if (digit < 0) digit = 0;
+	if (digit > 9) digit = 9;
+	drawImage(x,y,*digits[digit]);
+}
+
