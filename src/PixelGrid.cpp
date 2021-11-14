@@ -46,6 +46,8 @@ void PixelGridController::introUpdate()
 
 void PixelGridController::update()
 {
+	PGGraphics::resetRenderStates();
+	
 	if (!m_introDone) 
 	{
 		introUpdate();
@@ -66,6 +68,8 @@ void PixelGridController::update()
 		cur = millis();
 	}; 
 	s_LastMillis = cur;
+	
+	PGGraphics::resetRenderStates();
 }
 
 void PixelGridController::enableApps(bool onoff)

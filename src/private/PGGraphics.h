@@ -13,7 +13,9 @@ public:
 	static void update();
 
 	// drawing state
+	static void resetRenderStates();
 	static void setBlendMode(PGBlendMode bm);
+	static void setTint(pgcolor tint);
 	static void setDrawBrightness(uint8_t bright);
 	
 	static void clear();

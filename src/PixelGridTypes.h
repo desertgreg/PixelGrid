@@ -61,8 +61,12 @@ public:
 #define PG_GSHIFT 8
 #define PG_BSHIFT 0
 
-#define PGCOLOR(r,g,b) ((r<<PG_RSHIFT) | (g<<PG_GSHIFT) | (b<<PG_BSHIFT))
-#define PGCOLORA(r,g,b,a) ((r<<PG_RSHIFT) | (g<<PG_GSHIFT) | (b<<PG_BSHIFT))
+#define PGCOLOR(r,g,b) ((r<<PG_RSHIFT) | (g<<PG_GSHIFT) | (b<<PG_BSHIFT) | (0xff<<PG_ASHIFT))
+#define PGCOLORA(r,g,b,a) ((r<<PG_RSHIFT) | (g<<PG_GSHIFT) | (b<<PG_BSHIFT) | (a<<PG_ASHIFT))
+#define PGCOLOR_GETR(c) ((c>>PG_RSHIFT) & 0xff)
+#define PGCOLOR_GETG(c) ((c>>PG_GSHIFT) & 0xff)
+#define PGCOLOR_GETB(c) ((c>>PG_BSHIFT) & 0xff)
+#define PGCOLOR_GETA(c) ((c>>PG_ASHIFT) & 0xff)
 
 typedef uint32_t pgcolor;
 

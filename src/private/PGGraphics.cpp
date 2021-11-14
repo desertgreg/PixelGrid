@@ -19,11 +19,18 @@ PGFrameBuffer g_FrameBuffer;
 
 #endif
 
+#define DEFAULT_DRAW_BRIGHTNESS 0x10
 //
 // drawing state variables
 //
 static PGBlendMode g_blendMode = OPAQUE;
-static uint8_t g_drawBrightness = 0x10;
+static uint8_t g_tintR = 255;
+static uint8_t g_tintG = 255;
+static uint8_t g_tintB = 255;
+static uint8_t g_tintA = 255;
+static bool g_tintRGB = false;
+static bool g_tintAlpha = false;
+static uint8_t g_drawBrightness = DEFAULT_DRAW_BRIGHTNESS;
 static PGRenderTarget g_FrameBufferTarget;
 
 //
@@ -61,6 +68,19 @@ public:
 	}
 };
 
+class blend_opaque_tint
+{
+public:
+	static inline void blend(uint8_t * dst,const uint8_t * src)
+	{
+		// framebuffer is 0xaarrggbb, first byte is b, then g,r,a
+		*dst++ = (((*src++ * g_tintB)>>8) * g_drawBrightness)>>8;  //b
+		*dst++ = (((*src++ * g_tintG)>>8) * g_drawBrightness)>>8;  //g
+		*dst++ = (((*src++ * g_tintR)>>8) * g_drawBrightness)>>8;  //r
+		*dst++ = *src++;
+	}
+};
+
 
 //
 // blend additive - dst = src + dst
@@ -88,6 +108,29 @@ public:
 	}
 };
 
+
+class blend_additive_tint
+{
+public:
+	static inline void blend(uint8_t * dst,const uint8_t * src)
+	{
+		// framebuffer is 0xaarrggbb, first byte is b, then g,r,a
+		uint16_t tmp;
+		tmp = *dst + (((*src++ * g_tintB)>>8) * g_drawBrightness)>>8;  //b
+		if (tmp > 256) tmp = 255; // is there a clever way to saturate/clampe here?
+		*dst++ = tmp;
+
+		tmp = *dst + (((*src++ * g_tintG)>>8) * g_drawBrightness)>>8;  //g
+		if (tmp > 256) tmp = 255;
+		*dst++ = tmp;
+
+		tmp = *dst + (((*src++ * g_tintR)>>8) * g_drawBrightness)>>8;  //r
+		if (tmp > 256) tmp = 255; 
+		*dst++ = tmp;
+		
+		*dst++ += *src++;
+	}
+};
 
 //
 // blend_alpha - dst = (src * a) + (dst * (1-a))
@@ -121,13 +164,62 @@ public:
 	}
 };
 
+//
+// blend_alpha - dst = (src * a) + (dst * (1-a))
+//
+class blend_alpha_tint
+{
+public:
+	static inline void blend(uint8_t * dst,const uint8_t * src)
+	{
+		// framebuffer is 0xaarrggbb, first byte is b, then g,r,a
+		// first read src r,g,b and apply brightness compensation
+		uint8_t r,g,b,a;
+		b = (uint8_t)((uint16_t)(((*src++ * g_tintB)>>8) * g_drawBrightness)>>8);
+		g = (uint8_t)((uint16_t)(((*src++ * g_tintG)>>8) * g_drawBrightness)>>8);
+		r = (uint8_t)((uint16_t)(((*src++ * g_tintR)>>8) * g_drawBrightness)>>8);
+		a = ((*src++ * g_tintA)>>8);
+		uint8_t ainv = 255-a;
+		
+		// blend with existing data in the framebuffer
+		uint32_t tmp;
+		tmp = (b * a) + (*dst * ainv) >> 8;
+		*dst++ = (uint8_t)tmp;
+
+		tmp = (g * a) + (*dst * ainv) >> 8;
+		*dst++ = (uint8_t)tmp;
+		
+		tmp = (r * a) + (*dst * ainv) >> 8;
+		*dst++ = (uint8_t)tmp;
+
+		*dst++ = a;
+	}
+};
+
+
+
 inline void blend(uint8_t * dst, uint8_t * src)
 {
 	switch(g_blendMode)
 	{
-		case OPAQUE:	blend_opaque::blend(dst,src); break;
-		case ALPHA:		blend_alpha::blend(dst,src); break;
-		case ADDITIVE:	blend_additive::blend(dst,src); break;
+		case OPAQUE:	
+			if (g_tintRGB)
+				blend_opaque_tint::blend(dst,src); 
+			else
+				blend_opaque::blend(dst,src); 
+			break;
+		case ALPHA:		
+			if (g_tintRGB || g_tintA)
+				blend_alpha_tint::blend(dst,src); 
+			else	
+				blend_alpha::blend(dst,src); 
+			break;
+		case ADDITIVE:	
+			if (g_tintRGB)
+				blend_additive_tint::blend(dst,src);
+			else
+				blend_additive::blend(dst,src); 
+			break;
 	}
 }
 
@@ -154,9 +246,26 @@ void PGGraphics::update()
 	g_FrameBuffer.show();
 }
 
+void PGGraphics::resetRenderStates()
+{
+	g_blendMode = PGBlendMode::OPAQUE;
+	setTint(PGCOLORA(255,255,255,255));
+	setDrawBrightness(DEFAULT_DRAW_BRIGHTNESS);
+}
+
 void PGGraphics::setBlendMode(PGBlendMode bm)
 {
 	g_blendMode = bm;
+}
+
+void PGGraphics::setTint(pgcolor tint)
+{
+	g_tintR = PGCOLOR_GETR(tint);
+	g_tintG = PGCOLOR_GETG(tint);
+	g_tintB = PGCOLOR_GETB(tint);
+	g_tintA = PGCOLOR_GETA(tint);
+	g_tintRGB = ((g_tintR != 255) || (g_tintG != 255) || (g_tintB != 255));
+	g_tintAlpha = (g_tintA != 255);
 }
 
 void PGGraphics::setDrawBrightness(uint8_t bright)
@@ -422,15 +531,24 @@ void PGGraphics::drawImage(int x, int y,PGImage & img)
 	switch(g_blendMode)
 	{
 		case OPAQUE:
-			drawImageClipped<blend_opaque>(g_FrameBufferTarget,img);
+			if (g_tintRGB)
+				drawImageClipped<blend_opaque_tint>(g_FrameBufferTarget,img);
+			else
+				drawImageClipped<blend_opaque>(g_FrameBufferTarget,img);
 			break;
 		
 		case ALPHA:
-			drawImageClipped<blend_alpha>(g_FrameBufferTarget,img);
+			if (g_tintRGB||g_tintAlpha)
+				drawImageClipped<blend_alpha_tint>(g_FrameBufferTarget,img);
+			else
+				drawImageClipped<blend_alpha>(g_FrameBufferTarget,img);
 			break;
 		
 		case ADDITIVE:
-			drawImageClipped<blend_additive>(g_FrameBufferTarget,img);
+			if (g_tintRGB)
+				drawImageClipped<blend_additive_tint>(g_FrameBufferTarget,img);
+			else
+				drawImageClipped<blend_additive>(g_FrameBufferTarget,img);
 			break;
 	}
 }
