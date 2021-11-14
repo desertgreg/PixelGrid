@@ -14,18 +14,15 @@ int music_cursor = 0;
 
 PGSound * sounds[] = 
 {
-  &BossAppearSnd,
-  &EnterProgramSnd,
+  &ExplosionLongSnd,
   &ExitProgramSnd,
   &MenuMoveSnd,
   &MonsterAppearSnd,
   &MonsterHurtSnd,
-  &NextRoomSnd,
   &PickupCoinSnd,
-  &PixelgridStartupSnd,
   &SwooshSnd,
   &TakeDamageSnd,
-  &TestSoundSnd
+  &TestToneSnd
 };
 const int SND_COUNT = sizeof(sounds)/sizeof(sounds[0]);
 int cursor = 0;

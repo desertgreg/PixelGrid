@@ -6,6 +6,7 @@
 #include "PGTransition.h"
 #include "PixelGridTypes.h"
 #include "apps/PGSnakeApp.h"
+#include "apps/PGTimerApp.h"
 
 #define ICON_SIZE 13
 #define ICON_SPACING 13
@@ -35,7 +36,8 @@ PGTransition m_transition;
 void PGMenu::setup()
 {
 	// add the default apps, 
-	addApp(m_TestApp);
+	PGTimerApp * timer = new PGTimerApp();
+	addApp(*timer);
 	PGSnakeApp * snake = new PGSnakeApp;
 	addApp(*snake);
 	

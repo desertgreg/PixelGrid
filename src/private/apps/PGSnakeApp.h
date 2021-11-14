@@ -17,9 +17,21 @@ public:
 protected:
 
 	void checkNewHeadLocation(int x,int y);
+	void drawFloor();
 	void drawSnake();
 	void drawApples();
+	void drawWalls();
+	bool check_buttons_and_update_direction();
 	
+	void init_starting();
+	void update_starting();
+	
+	void init_playing();
+	void update_playing();
+	
+	void init_lost();
+	void update_lost();
+
 	enum SNAKE_FLAGS
 	{
 	  F_ALIVE = 0x01
@@ -43,7 +55,7 @@ protected:
 	};
 
 
-	static const int MAX_SEGMENTS = 64;
+	static const int MAX_SEGMENTS = 256;
 	SnakeSegStruct m_snake[MAX_SEGMENTS];
 	
 	static const int MAX_APPLES = 4;
@@ -70,6 +82,7 @@ protected:
 	};
 	int m_state;
 	int m_stateCounter;
+	int m_blowUpCounter;
 };
 
 
