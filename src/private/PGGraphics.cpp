@@ -93,15 +93,15 @@ public:
 		// framebuffer is 0xaarrggbb, first byte is b, then g,r,a
 		uint16_t tmp;
 		tmp = *dst + (*src++ * g_drawBrightness)>>8;  //b
-		if (tmp > 256) tmp = 255; // is there a clever way to saturate/clampe here?
+		if (tmp > 255) tmp = 255; // is there a clever way to saturate/clampe here?
 		*dst++ = tmp;
 
 		tmp = *dst + (*src++ * g_drawBrightness)>>8;  //g
-		if (tmp > 256) tmp = 255;
+		if (tmp > 255) tmp = 255;
 		*dst++ = tmp;
 
 		tmp = *dst + (*src++ * g_drawBrightness)>>8;  //r
-		if (tmp > 256) tmp = 255; 
+		if (tmp > 255) tmp = 255; 
 		*dst++ = tmp;
 		
 		*dst++ += *src++;
@@ -117,15 +117,15 @@ public:
 		// framebuffer is 0xaarrggbb, first byte is b, then g,r,a
 		uint16_t tmp;
 		tmp = *dst + (((*src++ * g_tintB)>>8) * g_drawBrightness)>>8;  //b
-		if (tmp > 256) tmp = 255; // is there a clever way to saturate/clampe here?
+		if (tmp > 255) tmp = 255; // is there a clever way to saturate/clampe here?
 		*dst++ = tmp;
 
 		tmp = *dst + (((*src++ * g_tintG)>>8) * g_drawBrightness)>>8;  //g
-		if (tmp > 256) tmp = 255;
+		if (tmp > 255) tmp = 255;
 		*dst++ = tmp;
 
 		tmp = *dst + (((*src++ * g_tintR)>>8) * g_drawBrightness)>>8;  //r
-		if (tmp > 256) tmp = 255; 
+		if (tmp > 255) tmp = 255; 
 		*dst++ = tmp;
 		
 		*dst++ += *src++;
