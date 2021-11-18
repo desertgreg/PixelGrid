@@ -24,10 +24,10 @@ PGFrameBuffer g_FrameBuffer;
 // drawing state variables
 //
 static PGBlendMode g_blendMode = OPAQUE;
-static uint8_t g_tintR = 255;
-static uint8_t g_tintG = 255;
-static uint8_t g_tintB = 255;
-static uint8_t g_tintA = 255;
+static uint32_t g_tintR = 256;
+static uint32_t g_tintG = 256;
+static uint32_t g_tintB = 256;
+static uint32_t g_tintA = 256;
 static bool g_tintRGB = false;
 static bool g_tintAlpha = false;
 static uint8_t g_drawBrightness = DEFAULT_DRAW_BRIGHTNESS;
@@ -142,25 +142,28 @@ public:
 	{
 		// framebuffer is 0xaarrggbb, first byte is b, then g,r,a
 		// first read src r,g,b and apply brightness compensation
-		uint8_t r,g,b,a;
-		b = (uint8_t)((uint16_t)(*src++ * g_drawBrightness)>>8);
-		g = (uint8_t)((uint16_t)(*src++ * g_drawBrightness)>>8);
-		r = (uint8_t)((uint16_t)(*src++ * g_drawBrightness)>>8);
-		a = (*src++);
-		uint8_t ainv = 255-a;
-		
+		uint32_t r,g,b,a;
+		b = (*src++ * g_drawBrightness)>>8;  //b
+		g = (*src++ * g_drawBrightness)>>8;  //g
+		r = (*src++ * g_drawBrightness)>>8;  //r
+		a = (*src++ * 0x102) >> 8;  // we need a to be 256 when we read 255 and 0 when we read 0.
+
 		// blend with existing data in the framebuffer
-		uint32_t tmp;
-		tmp = (b * a) + (*dst * ainv) >> 8;
-		*dst++ = (uint8_t)tmp;
+		if (a > 0)
+		{
+			uint32_t ainv = 256-a;
+			uint32_t tmp;
+			tmp = ((b * a) + (*dst * ainv)) >> 8;
+			*dst++ = (uint8_t)tmp;
 
-		tmp = (g * a) + (*dst * ainv) >> 8;
-		*dst++ = (uint8_t)tmp;
-		
-		tmp = (r * a) + (*dst * ainv) >> 8;
-		*dst++ = (uint8_t)tmp;
+			tmp = ((g * a) + (*dst * ainv)) >> 8;
+			*dst++ = (uint8_t)tmp;
 
-		*dst++ = a;
+			tmp = ((r * a) + (*dst * ainv)) >> 8;
+			*dst++ = (uint8_t)tmp;
+
+			*dst++ = a;
+		}
 	}
 };
 
@@ -178,21 +181,26 @@ public:
 		b = (uint8_t)((uint16_t)(((*src++ * g_tintB)>>8) * g_drawBrightness)>>8);
 		g = (uint8_t)((uint16_t)(((*src++ * g_tintG)>>8) * g_drawBrightness)>>8);
 		r = (uint8_t)((uint16_t)(((*src++ * g_tintR)>>8) * g_drawBrightness)>>8);
-		a = ((*src++ * g_tintA)>>8);
-		uint8_t ainv = 255-a;
+		a = (*src++ * 0x102) >> 8;  // we need a to be 256 when we read 255 and 0 when we read 0.
+		a = (a * g_tintA)>>8;
 		
-		// blend with existing data in the framebuffer
-		uint32_t tmp;
-		tmp = (b * a) + (*dst * ainv) >> 8;
-		*dst++ = (uint8_t)tmp;
+		if (a > 0)
+		{
+			uint32_t ainv = 256-a;
+			
+			// blend with existing data in the framebuffer
+			uint32_t tmp;
+			tmp = ((b * a) + (*dst * ainv)) >> 8;
+			*dst++ = (uint8_t)tmp;
 
-		tmp = (g * a) + (*dst * ainv) >> 8;
-		*dst++ = (uint8_t)tmp;
+			tmp = ((g * a) + (*dst * ainv)) >> 8;
+			*dst++ = (uint8_t)tmp;
+			
+			tmp = ((r * a) + (*dst * ainv)) >> 8;
+			*dst++ = (uint8_t)tmp;
 		
-		tmp = (r * a) + (*dst * ainv) >> 8;
-		*dst++ = (uint8_t)tmp;
-
-		*dst++ = a;
+			*dst++ = a;
+		}
 	}
 };
 
@@ -260,12 +268,15 @@ void PGGraphics::setBlendMode(PGBlendMode bm)
 
 void PGGraphics::setTint(pgcolor tint)
 {
-	g_tintR = PGCOLOR_GETR(tint);
-	g_tintG = PGCOLOR_GETG(tint);
-	g_tintB = PGCOLOR_GETB(tint);
-	g_tintA = PGCOLOR_GETA(tint);
-	g_tintRGB = ((g_tintR != 255) || (g_tintG != 255) || (g_tintB != 255));
-	g_tintAlpha = (g_tintA != 255);
+	// This math remaps 0..255 to 0..256 for each tint channel.  We do this
+	// so if you use a tint of 0xFFFFFFFF you would get back exactly the original color.
+	// this is because (x * 256) >> 8 = x;  in .8 fixed point, 1.0 = 256 or 0x100
+	g_tintR = (PGCOLOR_GETR(tint) * 0x102) >> 8;
+	g_tintG = (PGCOLOR_GETG(tint) * 0x102) >> 8;
+	g_tintB = (PGCOLOR_GETB(tint) * 0x102) >> 8;
+	g_tintA = (PGCOLOR_GETA(tint) * 0x102) >> 8;
+	g_tintRGB = ((g_tintR != 256) || (g_tintG != 256) || (g_tintB != 256));
+	g_tintAlpha = (g_tintA != 256);
 }
 
 void PGGraphics::setDrawBrightness(uint8_t bright)

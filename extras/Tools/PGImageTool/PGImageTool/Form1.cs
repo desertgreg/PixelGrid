@@ -79,49 +79,50 @@ namespace PGImageTool
                 Write_Image_Preamble(con, imagename);
 
                 // open the file and read into memory
-                Bitmap bitmap = new Bitmap(imagename);
-
-                int bytecounter = 0;
-                int rowcounter = 0;
-                con.sbcpp.Append("\t");
-
-                for (int j=0; j<bitmap.Height; ++j)
+                using (Bitmap bitmap = new Bitmap(imagename))
                 {
-                    for (int i=0; i<bitmap.Width; ++i)
+
+                    int bytecounter = 0;
+                    int rowcounter = 0;
+                    con.sbcpp.Append("\t");
+
+                    for (int j = 0; j < bitmap.Height; ++j)
                     {
-                        Color pixel = bitmap.GetPixel(i,j);
-
-                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + ",");
-                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.B, 16).PadLeft(2, '0') + ",");
-                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + ",");
-                        //con.sbcpp.Append("0x" + Convert.ToString(pixel.R, 16).PadLeft(2, '0') );
-
-                        con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + Convert.ToString(pixel.R, 16).PadLeft(2, '0') + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + Convert.ToString(pixel.B, 16).PadLeft(2, '0'));
-
-                        // comma after every byte unless last byte
-                        bytecounter++;
-                        if ((j < bitmap.Height-1) || (i < bitmap.Width-1))
+                        for (int i = 0; i < bitmap.Width; ++i)
                         {
-                            con.sbcpp.Append(",");
-                        }
+                            Color pixel = bitmap.GetPixel(i, j);
 
-                        // carriage return after every 'n' charactersc++
-                        rowcounter++;
-                        if (rowcounter > 60)
+                            //con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + ",");
+                            //con.sbcpp.Append("0x" + Convert.ToString(pixel.B, 16).PadLeft(2, '0') + ",");
+                            //con.sbcpp.Append("0x" + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + ",");
+                            //con.sbcpp.Append("0x" + Convert.ToString(pixel.R, 16).PadLeft(2, '0') );
+
+                            con.sbcpp.Append("0x" + Convert.ToString(pixel.A, 16).PadLeft(2, '0') + Convert.ToString(pixel.R, 16).PadLeft(2, '0') + Convert.ToString(pixel.G, 16).PadLeft(2, '0') + Convert.ToString(pixel.B, 16).PadLeft(2, '0'));
+
+                            // comma after every byte unless last byte
+                            bytecounter++;
+                            if ((j < bitmap.Height - 1) || (i < bitmap.Width - 1))
+                            {
+                                con.sbcpp.Append(",");
+                            }
+                        }
+                        // carriage return after every row unless its the last row
+                        if (j < bitmap.Height - 1)
                         {
                             con.sbcpp.Append("\r\n\t");
-                            rowcounter = 0;
                         }
                     }
-                }
 
-                Write_Image_Postamble(con, imagename, bitmap.Width,bitmap.Height);
+                    Write_Image_Postamble(con, imagename, bitmap.Width, bitmap.Height);
+                }
             }
             Write_File_Postamble(con, filename);
 
             con.Generate_Files();
-
-            MessageBox.Show("Success! Generated Files:\r\n" + con.OutputCppName + "\r\n" + con.Header_File_From_Cpp());
+            StatusLabel.Text = "Generated Files!"; // MessageBox.Show("Success! Generated Files:\r\n" + con.OutputCppName + "\r\n" + con.Header_File_From_Cpp());
+            StatusLabel.Visible = true;
+            ClearStatustimer.Stop();
+            ClearStatustimer.Start();
         }
 
         void Write_Image_Postamble(CodeGenContext con, string imagename, int w,int h)
@@ -141,5 +142,10 @@ namespace PGImageTool
             con.sbh.Append("\r\n#endif //" + con.Header_Guard() + "\r\n");
         }
 
+        private void ClearStatustimer_Tick(object sender, EventArgs e)
+        {
+            StatusLabel.Text = "";
+            ClearStatustimer.Stop();
+        }
     }
 }
