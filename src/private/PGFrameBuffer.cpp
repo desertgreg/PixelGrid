@@ -22,7 +22,7 @@ void PGFrameBuffer::begin()
 	SerialUSB.print("\r\n");
 	
 	memset(m_FrontBuffer,0,sizeof(m_FrontBuffer));
-    m_Spi = new SPIClass(&sercom1, NEOPIXEL_PIN, NEOPIXEL_PIN, NEOPIXEL_PIN, SPI_PAD_3_SCK_1, SERCOM_RX_PAD_1);
+    m_Spi = new SPIClassSAMD(&sercom1, NEOPIXEL_PIN, NEOPIXEL_PIN, NEOPIXEL_PIN, SPI_PAD_3_SCK_1, SERCOM_RX_PAD_1);
 	m_Spi->begin();
 	pinPeripheral(NEOPIXEL_PIN, PIO_SERCOM);
 	m_Dma.setTrigger(SERCOM1_DMAC_ID_TX);
