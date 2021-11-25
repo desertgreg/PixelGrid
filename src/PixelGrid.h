@@ -20,7 +20,9 @@ public:
 	
 	void setup();
 	void update();
-
+	
+	uint32_t getFrame() { return m_frameCounter; }
+	
 	// Buttons
 	uint8_t isDown(PGButton b);
 	uint8_t wasPressed(PGButton b);
@@ -66,11 +68,12 @@ private:
 	
 	bool m_appsEnabled = false;
 	bool m_introDone = false;
+	uint32_t m_frameCounter = 0;
 };
+
 
 // Global instance of the PixelGridController
 extern PixelGridController PixelGrid;
-
 
 
 // Inline functions to call into the pixelgrid subsystems.

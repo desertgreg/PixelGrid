@@ -55,6 +55,18 @@ struct ButtonStruct
 	{
 		return m_CurState;
 	}
+	
+	//void debugPrint()
+	//{
+	//	SerialUSB.print(m_CurState); 
+	//	SerialUSB.print(" ");
+	//	SerialUSB.print(m_PrevState);
+	//	SerialUSB.print(" ");
+	//	SerialUSB.print(m_DebounceState);
+	//	SerialUSB.print(" ");
+	//	SerialUSB.print(m_DebounceTime);
+	//	SerialUSB.print("\r\n");
+	//}
 };
 
 
@@ -80,7 +92,7 @@ void PGButtons::setup()
 	{
 		pinMode(m_Buttons[i].m_Pin,INPUT);
 	}
-
+	
 	// update a few times to eat any inital presses
 	update();
 	update();

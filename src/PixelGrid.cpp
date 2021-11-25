@@ -13,6 +13,9 @@ PGTransition m_Transitions;
 
 void PixelGridController::setup()
 {
+	pinMode(PIN_LED,OUTPUT);
+	SerialUSB.begin(115200);
+
 	PGButtons::setup();
 	PGSounds::setup();
 	PGGraphics::setup();
@@ -47,6 +50,7 @@ void PixelGridController::introUpdate()
 void PixelGridController::update()
 {
 	PGGraphics::resetRenderStates();
+	m_frameCounter++;
 	
 	if (!m_introDone) 
 	{
