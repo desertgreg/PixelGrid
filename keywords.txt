@@ -1,10 +1,52 @@
 # Syntax Coloring Map For ExampleLibrary
 
 # Datatypes (KEYWORD1)
-Test    KEYWORD1
+pgcolor	KEYWORD1
+
+# Structures
+PGSound	KEYWORD3
+PGImage KEYWORD3
+PGApp	KEYWORD3
+
+
 
 # Methods and Functions (KEYWORD2)
-doSomething KEYWORD2
+setup KEYWORD2
+update KEYWORD2
+
+# Button methods
+isDown KEYWORD2
+wasPressed KEYWORD2
+wasReleased KEYWORD2
+anyPressed KEYWORD2
+
+# Sound methods
+setChannelVolume KEYWORD2
+playSound KEYWORD2
+
+# Graphics methods
+resetRenderStates KEYWORD2
+setBlendMode KEYWORD2
+setTint KEYWORD2
+setBrightness KEYWORD2
+clear KEYWORD2
+fill KEYWORD2
+setPixel KEYWORD2
+drawRow KEYWORD2
+drawColumn KEYWORD2
+drawBox KEYWORD2
+drawImage KEYWORD2
+drawDigit KEYWORD2
+drawNumber KEYWORD2
+
+# Misc
+interpolateColors KEYWORD2
+print KEYWORD2
+
+# Apps
+enableApps KEYWORD2
+addApp KEYWORD2
+
 
 # Instances (KEYWORD2)
 
