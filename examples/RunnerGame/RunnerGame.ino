@@ -29,6 +29,98 @@ void setup() {
 }
 
 
+const int STATE_WAITING = 0;
+const int STATE_PLAYING = 1;
+const int STATE_LOST = 2;
+const int STATE_COUNTING = 3;
+
+int g_GameState = STATE_WAITING;
+int g_GameStateCounter = 0;
+int g_CrateCount = 0;
+int g_ScoreCounter = 0;
+
+
+bool checkCharacter();
+
+
+/////////////////////////////////////////////////////
+// Character
+/////////////////////////////////////////////////////
+
+const float JUMPVEL = -0.5f;
+const float GROUND = 9.0f;
+
+float cx = 3.0f;
+float cy = GROUND;
+float cyvel = 0.0f;
+float cyaccel = 0.02f;
+
+
+void debug_char()
+{
+  SerialUSB.print(cy);
+  SerialUSB.print(" ");
+  SerialUSB.print(cyvel);
+  SerialUSB.print("\r\n");
+}
+
+void moveCharacter()
+{
+    // physics
+    if (cy < GROUND) 
+    {
+      cy += cyvel;
+      cyvel += cyaccel;
+    }
+    else
+    {
+      cy = GROUND;
+
+      // if the user is on the ground, they can jump!
+      if (PixelGrid.wasPressed(PGButton::B))
+      {
+         cyvel = JUMPVEL;
+         cy += cyvel;
+         PixelGrid.playSound(JumpSnd);
+        //digitalWrite(PIN_LED,1);
+      }
+    }
+}
+
+
+bool isEven(int value)
+{
+  return (value % 2) == 0;
+}
+
+void updateCharacter()
+{
+    digitalWrite(PIN_LED,PixelGrid.isDown(PGButton::B));
+
+    if (g_GameState == STATE_PLAYING)
+    {
+      moveCharacter();
+      if (checkCharacter())
+      {
+        g_GameState = STATE_LOST;
+        g_GameStateCounter = 0;
+      }
+    }
+
+    // when the player loses, we'll draw the player blinking and frozen in place 
+    bool blink = false;
+    if (g_GameState == STATE_LOST)
+    {
+      blink = isEven(g_GameStateCounter / 10);   
+    }
+    
+    if (blink == false)
+    {
+      PixelGrid.drawImage(cx,cy,DudeImg);
+    }
+}
+
+
 /////////////////////////////////////////////////////
 // Crates 2x2 pixel obstacles
 /////////////////////////////////////////////////////
@@ -46,12 +138,26 @@ class CrateClass
       m_x = 15.0f;
       m_vx = -0.1f;
     }
-    
+
+    bool isPastPlayer()
+    {
+      if (m_x < cx) return true;
+      else return false;
+    }
     void update()
     {
       if (isActive())
       {
-        m_x += m_vx;
+        if (g_GameState == STATE_PLAYING)
+        {
+          bool was_past_player = isPastPlayer();
+          m_x += m_vx;
+          bool is_past_player = isPastPlayer();
+          if ((was_past_player == false) && (is_past_player == true))
+          {
+            g_CrateCount++;
+          }
+        }
         PixelGrid.drawImage(m_x,10,CrateImg);
       }
     }
@@ -79,6 +185,14 @@ void spawn_crate()
   }
 }
 
+void resetCrates()
+{
+  for (int i=0; i<MAX_CRATES; ++i)
+  {
+    crates[i].m_x = -999.0f;
+  }
+}
+
 void udpateCrates()
 {
   for (int i=0; i<MAX_CRATES; ++i)
@@ -87,58 +201,36 @@ void udpateCrates()
   }
 
   // is it time to spawn another crate?
-  crateTimer--;
-  if (crateTimer <= 0)
+  if (g_GameState == STATE_PLAYING)
   {
-    spawn_crate();
-    crateTimer = MIN_CRATE_TIME + rand() % RANDOM_CRATE_TIME;
+    crateTimer--;
+    if (crateTimer <= 0)
+    {
+      spawn_crate();
+      crateTimer = MIN_CRATE_TIME + rand() % RANDOM_CRATE_TIME;
+    }
   }
 }
 
-/////////////////////////////////////////////////////
-// Character
-/////////////////////////////////////////////////////
-
-float cx = 3.0f;
-float cy = 0.0f;
-float cyvel = 0.0f;
-float cyaccel = 0.03f;
-
-const float JUMPVEL = -0.5f;
-const float GROUND = 9.0f;
-
-void debug_char()
+bool checkCharacter()
 {
-  SerialUSB.print(cy);
-  SerialUSB.print(" ");
-  SerialUSB.print(cyvel);
-  SerialUSB.print("\r\n");
-}
-void updateCharacter()
-{
-    digitalWrite(PIN_LED,PixelGrid.isDown(PGButton::B));
-
-    // physics
-    if (cy < GROUND) 
+    // check if we are colliding with a box...
+    for (int i=0; i<MAX_CRATES; ++i)
     {
-      cy += cyvel;
-      cyvel += cyaccel;
-    }
-    else
-    {
-      cy = GROUND;
-
-      // if the user is on the ground, they can jump!
-      if (PixelGrid.wasPressed(PGButton::B))
+      if (crates[i].isActive())
       {
-         cyvel = JUMPVEL;
-         cy += cyvel;
-         PixelGrid.playSound(JumpSnd);
-        //digitalWrite(PIN_LED,1);
+        if ((crates[i].m_x >= 3) && (crates[i].m_x <= 4))
+        {
+          if (cy >= GROUND-2)
+          {
+            // oops!  hit the box
+            PixelGrid.playSound(MonsterHurtSnd);
+            return true;
+          }
+        }
       }
     }
-    
-    PixelGrid.drawImage(cx,cy,DudeImg);
+    return false;
 }
 
 
@@ -155,19 +247,22 @@ int layer2v = -8;
 void updateBackground()
 {
   bool print = false;
-  if (1) { //PixelGrid.isDown(PGButton::R)) { 
-    layer2x += layer2v;
-    layer1x += layer1v;
-    layer0x += layer0v;
-    //print = true;
+  if (g_GameState == STATE_PLAYING)
+  {
+    if (1) { //PixelGrid.isDown(PGButton::R)) { 
+      layer2x += layer2v;
+      layer1x += layer1v;
+      layer0x += layer0v;
+      //print = true;
+    }
+    else if (PixelGrid.isDown(PGButton::L)) { 
+      layer2x -= layer2v;
+      layer1x -= layer1v;
+      layer0x -= layer0v;
+      //print = true;
+    }
   }
-  else if (PixelGrid.isDown(PGButton::L)) { 
-    layer2x -= layer2v;
-    layer1x -= layer1v;
-    layer0x -= layer0v;
-    //print = true;
-  }
-
+  
   PixelGrid.resetRenderStates();
   
   if (PixelGrid.isDown(PGButton::A)) PixelGrid.setBlendMode(PGBlendMode::OPAQUE);
@@ -215,29 +310,48 @@ void updateBackground()
 
 void loop() 
 {
-  if (PixelGrid.isDown(PGButton::U)) 
-  { 
-    if (PixelGrid.wasPressed(PGButton::B)) 
-    {
-      SerialUSB.print("B! "); 
-    } 
-    SerialUSB.print("loop\r\n"); 
-  }
-  /*if (PixelGrid.wasPressed(PGButton::U)) { y = y-1; }
-  if (PixelGrid.wasPressed(PGButton::D)) { y = y+1; }
-  if (PixelGrid.wasPressed(PGButton::L)) { x = x-1; }
-  if (PixelGrid.wasPressed(PGButton::R)) { x = x+1; }
-
-  PixelGrid.setPixel(x,y,PGCOLOR(0x80,0x80,0xff));
-  */
+  g_GameStateCounter++;
   
-  //if (PixelGrid.wasPressed(PGButton::A)) { bright = 128; PixelGrid.playSound(MenuMoveSnd);SerialUSB.print(bright);}
-  //if (PixelGrid.wasPressed(PGButton::B)) { bright = 9; PixelGrid.playSound(SwooshSnd); SerialUSB.print(bright);}
-
   PixelGrid.clear();
   updateBackground();
-  updateCharacter();
   udpateCrates();
+  updateCharacter();
+
+  if (g_GameState == STATE_WAITING)
+  {
+    if (PixelGrid.anyPressed())
+    {
+      g_GameState = STATE_PLAYING;
+      g_GameStateCounter = 0;
+    }
+  }
+  else if (g_GameState == STATE_LOST)
+  {
+    if (g_GameStateCounter > 150)
+    {
+      g_GameState = STATE_COUNTING;
+      g_GameStateCounter = 0;
+      g_ScoreCounter = 0;
+    }
+  }
+  else if (g_GameState == STATE_COUNTING)
+  {
+    if (g_ScoreCounter < g_CrateCount)
+    {
+      if (g_GameStateCounter > 10) 
+      {
+        g_ScoreCounter ++;
+        g_GameStateCounter = 0;
+      }
+    }
+    PixelGrid.drawNumber(1,0,g_ScoreCounter);
+    if (PixelGrid.anyPressed())
+    {
+      resetCrates();
+      g_GameState = STATE_PLAYING;
+      g_GameStateCounter = 0;   
+    }
+  }
 
   // done with this frame!
   PixelGrid.update();

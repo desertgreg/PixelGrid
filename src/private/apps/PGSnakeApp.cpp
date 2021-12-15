@@ -18,8 +18,7 @@ static pgcolor snakeColor(int i)
 }
 
 
-PGSnakeApp::PGSnakeApp() :
-	m_icon(0x00,0x38,0xc4,0x04,0x09,0x7d,0x82,0x7c)
+PGSnakeApp::PGSnakeApp() 
 {
 }
 		
