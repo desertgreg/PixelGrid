@@ -289,17 +289,31 @@ void PGGraphics::setDrawBrightness(uint8_t bright)
 
 void PGGraphics::clear()
 {
-	for (int i=0; i<PIXEL_COUNT; ++i)
+	for (int j=0; j<g_FrameBufferTarget.m_Height; ++j)
 	{
-		g_FrameBuffer.setPixelColor(i,0);
+		for (int i=0; i<g_FrameBufferTarget.m_Width; ++i)
+		{
+			uint8_t* dst = g_FrameBufferTarget.getPixelAddr(i,j);
+			pgcolor* dstcolor = (pgcolor*)dst;
+			*dstcolor = 0;
+		}
+	}
+	
+	for (int i=0; i<INDICATOR_COUNT; ++i)
+	{
+		setIndicator(i,0);
 	}
 }
 
 void PGGraphics::fill(pgcolor color)
 {
-	for (int i=0; i<PIXEL_COUNT; ++i)
+	for (int j=0; j<g_FrameBufferTarget.m_Height; ++j)
 	{
-		g_FrameBuffer.setPixelColor(i,color);
+		for (int i=0; i<g_FrameBufferTarget.m_Width; ++i)
+		{
+			uint8_t * dst = g_FrameBufferTarget.getPixelAddr(i,j);
+			blend(dst,(uint8_t*)(&color));
+		}
 	}
 }
 
@@ -311,6 +325,21 @@ void PGGraphics::setPixel(int x,int y,pgcolor color)
 	uint8_t* src = (uint8_t*)&color;
 	uint8_t* dst = g_FrameBufferTarget.getPixelAddr(x,y);
 	blend(dst,src);
+}
+
+//
+// Set the color of the 6 indicator pixels below the screen, note that this code goes directly
+// to the framebuffer, it is not routed through the potential future 'render target' code.  
+// 
+void PGGraphics::setIndicator(int a,pgcolor color)
+{
+	if ((a >= 0) && (a < INDICATOR_COUNT))
+	{
+		uint8_t* src = (uint8_t*)&color;
+		pgcolor * dstcolor = g_FrameBuffer.getBackBuffer() + INDICATOR_OFFSET + a;
+		uint8_t* dst = (uint8_t*)dstcolor;
+		blend_opaque::blend(dst,src);
+	}
 }
 
 void PGGraphics::drawRow(int x0,int x1,int y, pgcolor color)

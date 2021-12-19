@@ -119,7 +119,8 @@ public:
 	PGRenderTarget() {}
 	PGRenderTarget(uint8_t * buffer, uint16_t w, uint16_t h) : m_Width(w),m_Height(h),m_PixelData(buffer) {}
 	int getStride() { return m_Width * 4; }
-	uint8_t * getPixelAddr(int x,int y) { return &m_PixelData[x*4 + y*m_Width*4]; }
+	int getPixelCount() { return m_Width * m_Height; }
+	uint8_t * getPixelAddr(int x,int y) { return &m_PixelData[x*4 + y*getStride()]; }
 	
 	uint16_t m_Width = 0;
 	uint16_t m_Height = 0;

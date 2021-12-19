@@ -21,6 +21,7 @@ public:
 	static void clear();
 	static void fill(pgcolor color);
 	static void setPixel(int x,int y,pgcolor color);
+	static void setIndicator(int a,pgcolor color);
 	static void drawRow(int x0,int x1,int y, pgcolor color);
 	static void drawColumn(int x,int y0, int y1, pgcolor color);
 	static void drawBox(int x0,int y0, int x1,int y1, pgcolor color);
