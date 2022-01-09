@@ -1,4 +1,3 @@
-
 #ifndef PIXELGRID_H
 #define PIXELGRID_H
 
@@ -56,9 +55,11 @@ public:
 	
 	// Debugging
 	void print(int val);
+	void print(float val);
 	void print(char * string);
 	void print(pgcolor c);
 	void print(char * label, int val);
+	void print(char * label, float val);
 	
 	// Apps (optional, enables a menu and multiple applications, add your game using 'addApp')
 	void enableApps(bool onoff = true);
@@ -118,6 +119,13 @@ inline void PixelGridController::print(int val)
 	SerialUSB.print(val);
 	SerialUSB.print("\r\n");
 }
+
+inline void PixelGridController::print(float val)
+{
+	SerialUSB.print(val);
+	SerialUSB.print("\r\n");
+}
+
 inline void PixelGridController::print(char * string)
 {
 	SerialUSB.print(string);
@@ -138,6 +146,14 @@ inline void PixelGridController::print(pgcolor c)
 }
 
 inline void PixelGridController::print(char * label, int val)
+{
+	SerialUSB.print(label);
+	SerialUSB.print(" ");
+	SerialUSB.print(val);
+	SerialUSB.print("\r\n");
+}
+
+inline void PixelGridController::print(char * label, float val)
 {
 	SerialUSB.print(label);
 	SerialUSB.print(" ");
