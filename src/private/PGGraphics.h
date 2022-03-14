@@ -1,7 +1,7 @@
 #ifndef PGRENDER_H
 #define PGRENDER_H
 
-#include "..\PixelGridTypes.h"
+#include "../PixelGridTypes.h"
 #include <stdint.h>
 #include <string.h>
 

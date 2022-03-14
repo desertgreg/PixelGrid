@@ -2,11 +2,11 @@
 #define PIXELGRID_H
 
 #include "PixelGridTypes.h"
-#include "private\PGButtons.h"
-#include "private\PGSounds.h"
-#include "private\PGGraphics.h"
-#include "private\PGSystemSounds.h"
-#include "private\PGSystemImages.h"
+#include "private/PGButtons.h"
+#include "private/PGSounds.h"
+#include "private/PGGraphics.h"
+#include "private/PGSystemSounds.h"
+#include "private/PGSystemImages.h"
 
 
 

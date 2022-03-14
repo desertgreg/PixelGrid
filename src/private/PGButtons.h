@@ -1,7 +1,7 @@
 #ifndef PGBUTTONS_H
 #define PGBUTTONS_H
 
-#include "..\PixelGridTypes.h"
+#include "../PixelGridTypes.h"
 #include <stdint.h>
 
 class PGButtons
