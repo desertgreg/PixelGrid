@@ -8,18 +8,34 @@ uint32_t s_LastMillis = 0;
 
 PixelGridController PixelGrid;
 PGTransition m_Transitions;
+PGHardwareType m_Hardware;
 
 
-
-void PixelGridController::setup()
+void PixelGridController::setup(PGHardwareType hw, int stripleds)
 {
+	m_Hardware = hw;
 	pinMode(PIN_LED,OUTPUT);
 	SerialUSB.begin(115200);
 
 	PGButtons::setup();
 	PGSounds::setup();
-	PGGraphics::setup();
-	m_introDone = false;
+	
+	int w,h,indicators;
+	switch (hw)
+	{
+		case HW_PIXELGRID_16X8:
+			m_introDone = true;
+			w=16; h=8; indicators=stripleds; 
+			break;
+		case HW_PIXELGRID_COLOR:
+		default:
+			m_introDone = false;
+			w=13; h=13;indicators=6; 
+			break;
+	}
+	PGGraphics::setup(w,h,indicators);
+
+
 }
 
 
@@ -27,7 +43,7 @@ void PixelGridController::introUpdate()
 {
 	static int first = 1;
 	static int startup_x = 15<<1;
-	
+
 	// Startup animation
 	if (first == 1)
 	{

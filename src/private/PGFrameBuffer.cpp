@@ -13,26 +13,35 @@
 // In Arduino Zero's Schematic there are two ports with I2C communication, D3/D4(PA09/PA08), I2C_SDA/I2C_SCL(PA22/PA23).
 
 
-void PGFrameBuffer::begin()
+void PGFrameBuffer::begin(int w,int h,int indicators)
 {
-	pinMode(NEOPIXEL_PIN, OUTPUT);
-    digitalWrite(NEOPIXEL_PIN, LOW);
+	if (w>MAX_WIDTH) w = MAX_WIDTH;
+	if (h>MAX_HEIGHT) h = MAX_HEIGHT;
+	if (indicators>MAX_INDICATORS) indicators = MAX_INDICATORS;
 	
-	SerialUSB.print(FB_SIZE);
-	SerialUSB.print("\r\n");
+	m_Width = w;
+	m_Height = h;
+	m_Indicators = indicators;
+	m_IndicatorOffset = m_Width*m_Height;
+	m_FBSize = FB_SIZE(w*h + indicators);
+	m_NumPixels = m_Width*m_Height+m_Indicators;
+
+	pinMode(NEOPIXEL_PIN, OUTPUT);
+	digitalWrite(NEOPIXEL_PIN, LOW);
 	
 	memset(m_FrontBuffer,0,sizeof(m_FrontBuffer));
-    m_Spi = new SPIClassSAMD(&sercom1, NEOPIXEL_PIN, NEOPIXEL_PIN, NEOPIXEL_PIN, SPI_PAD_3_SCK_1, SERCOM_RX_PAD_1);
+
+	m_Spi = new SPIClassSAMD(&sercom1, NEOPIXEL_PIN, NEOPIXEL_PIN, NEOPIXEL_PIN, SPI_PAD_3_SCK_1, SERCOM_RX_PAD_1);
 	m_Spi->begin();
 	pinPeripheral(NEOPIXEL_PIN, PIO_SERCOM);
 	m_Dma.setTrigger(SERCOM1_DMAC_ID_TX);
 	m_Dma.setAction(DMA_TRIGGER_ACTON_BEAT);
 	if (DMA_STATUS_OK == m_Dma.allocate())
 	{
-		if (m_Dma.addDescriptor(m_FrontBuffer,(void*)(&SERCOM1->SPI.DATA.reg),FB_SIZE,DMA_BEAT_SIZE_BYTE,true,false))
+		if (m_Dma.addDescriptor(m_FrontBuffer,(void*)(&SERCOM1->SPI.DATA.reg),m_FBSize,DMA_BEAT_SIZE_BYTE,true,false))
 		{
 			m_Dma.loop(true);
-			memset(m_FrontBuffer,0,FB_SIZE);
+			memset(m_FrontBuffer,0,m_FBSize);
 			m_Spi->beginTransaction(SPISettings(2400000,MSBFIRST,SPI_MODE0));
 			m_Dma.startJob();
 		}
@@ -66,7 +75,7 @@ void PGFrameBuffer::show()
 	uint8_t *in = (uint8_t*)m_BackBuffer;
 	uint8_t *out = m_FrontBuffer;
 	uint32_t expand;
-	for (int i=0; i<NUMPIXELS; i++) 
+	for (int i=0; i<m_NumPixels; i++) 
 	{
 		// read from our framebuffer, pixels are in 0xaarrggbb format
 		// due to little endian, first byte is b, then g,r,a

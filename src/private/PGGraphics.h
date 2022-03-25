@@ -9,7 +9,7 @@
 class PGGraphics
 {
 public:
-	static void setup();
+	static void setup(int w,int h,int indicators);
 	static void update();
 
 	// drawing state

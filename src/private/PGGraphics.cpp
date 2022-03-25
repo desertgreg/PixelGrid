@@ -7,11 +7,11 @@
 
 #define USE_ADAFRUIT 0
 #define PIXEL_PIN   12 
-#define PIXEL_COUNT 13*13 
 
 #if USE_ADAFRUIT
 
 #include <Adafruit_NeoPixel_ZeroDMA.h>
+#define PIXEL_COUNT 13*13 
 Adafruit_NeoPixel_ZeroDMA g_FrameBuffer(PIXEL_COUNT, PIXEL_PIN, NEO_GRB);
 
 #else
@@ -237,15 +237,15 @@ inline void blend(uint8_t * dst, uint8_t * src)
 //
 ////////////////////////////////////////////////////////////////////////////////////
 
-void PGGraphics::setup()
+void PGGraphics::setup(int w,int h,int indicators)
 {
-	g_FrameBuffer.begin();
+	g_FrameBuffer.begin(w,h,indicators);
 	
 	// set up the internal default render target to point at the frame buffer.
 	// if we ever support user render targets, we would move this code to a function
 	// that we run whenever they clear out their custom render target
-	g_FrameBufferTarget.m_Width = 13;
-	g_FrameBufferTarget.m_Height = 13;
+	g_FrameBufferTarget.m_Width = w;
+	g_FrameBufferTarget.m_Height = h;
 	g_FrameBufferTarget.m_PixelData = (uint8_t*)g_FrameBuffer.getBackBuffer();
 }
 
@@ -299,7 +299,7 @@ void PGGraphics::clear()
 		}
 	}
 	
-	for (int i=0; i<INDICATOR_COUNT; ++i)
+	for (int i=0; i<g_FrameBuffer.getIndicatorCount(); ++i)
 	{
 		setIndicator(i,0);
 	}
@@ -319,8 +319,8 @@ void PGGraphics::fill(pgcolor color)
 
 void PGGraphics::setPixel(int x,int y,pgcolor color)
 {
-	if ((x < 0) || (x >= 13)) return;
-	if ((y < 0) || (y >= 13)) return;
+	if ((x < 0) || (x >= g_FrameBufferTarget.getWidth())) return;
+	if ((y < 0) || (y >= g_FrameBufferTarget.getHeight())) return;
 	
 	uint8_t* src = (uint8_t*)&color;
 	uint8_t* dst = g_FrameBufferTarget.getPixelAddr(x,y);
@@ -333,10 +333,10 @@ void PGGraphics::setPixel(int x,int y,pgcolor color)
 // 
 void PGGraphics::setIndicator(int a,pgcolor color)
 {
-	if ((a >= 0) && (a < INDICATOR_COUNT))
+	if ((a >= 0) && (a < g_FrameBuffer.getIndicatorCount()))
 	{
 		uint8_t* src = (uint8_t*)&color;
-		pgcolor * dstcolor = g_FrameBuffer.getBackBuffer() + INDICATOR_OFFSET + a;
+		pgcolor * dstcolor = g_FrameBuffer.getBackBuffer() + g_FrameBuffer.getIndicatorOffset() + a;
 		uint8_t* dst = (uint8_t*)dstcolor;
 		blend_opaque::blend(dst,src);
 	}
@@ -345,12 +345,12 @@ void PGGraphics::setIndicator(int a,pgcolor color)
 void PGGraphics::drawRow(int x0,int x1,int y, pgcolor color)
 {
 	// clip the coordinates to the screen
-	if ((y < 0) || (y>=13)) return;
+	if ((y < 0) || (y>=g_FrameBufferTarget.getHeight())) return;
 	if (x0 > x1) { int tmp = x0; x0 = x1; x1 = tmp; }
 	if (x0 < 0) { x0 = 0; }
-	if (x0 >= 13) return;
+	if (x0 >= g_FrameBufferTarget.getWidth()) return;
 	if (x1 < 0) return;
-	if (x1 >= 13) x1 = 12;
+	if (x1 >= g_FrameBufferTarget.getWidth()) { x1 = g_FrameBufferTarget.getWidth()-1; }
 	
 	// fill the row
 	uint8_t * dst = g_FrameBufferTarget.getPixelAddr(x0,y);
@@ -366,12 +366,12 @@ void PGGraphics::drawRow(int x0,int x1,int y, pgcolor color)
 void PGGraphics::drawColumn(int x,int y0, int y1, pgcolor color)
 {
 	// clip the coordinates to the screen
-	if ((x < 0) || (x>=13)) return;
+	if ((x < 0) || (x>=g_FrameBufferTarget.getWidth())) return;
 	if (y0 > y1) { int tmp = y0; y0 = y1; y1 = tmp; }
-	if (y0 >= 13) return;
+	if (y0 >= g_FrameBufferTarget.getHeight()) return;
 	if (y1 < 0) return;
 	if (y0 < 0) { y0 = 0; }
-	if (y1 >= 13) { y1 = 12; }
+	if (y1 >= g_FrameBufferTarget.getHeight()) { y1 = g_FrameBufferTarget.getHeight()-1; }
 	
 	// draw the row
 	uint8_t * dest = g_FrameBufferTarget.getPixelAddr(x,y0);
@@ -417,13 +417,13 @@ void PGGraphics::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color)
 		src_y0 = -y;
 		dst_y0 = 0;
 	}
-	if (x+8 > 13)
+	if (x+8 > g_FrameBufferTarget.getWidth())
 	{
-		dst_x1 = 13;
+		dst_x1 = g_FrameBufferTarget.getWidth();
 	}
-	if (y+8 > 13)
+	if (y+8 > g_FrameBufferTarget.getHeight())
 	{
-		dst_y1 = 13;
+		dst_y1 = g_FrameBufferTarget.getHeight();
 	}
 
 	uint8_t * src = (uint8_t*)&color;
@@ -468,13 +468,13 @@ void PGGraphics::drawBitmapInvert(int x, int y,PGBitmap8 & bmp,pgcolor color)
 		src_y0 = -y;
 		dst_y0 = 0;
 	}
-	if (x+8 > 13)
+	if (x+8 > g_FrameBufferTarget.getWidth())
 	{
-		dst_x1 = 13;
+		dst_x1 = g_FrameBufferTarget.getWidth();
 	}
-	if (y+8 > 13)
+	if (y+8 > g_FrameBufferTarget.getHeight())
 	{
-		dst_y1 = 13;
+		dst_y1 = g_FrameBufferTarget.getHeight();
 	}
 	int src_y = src_y0;
 	uint8_t * src = (uint8_t*)&color;
@@ -526,13 +526,13 @@ void PGGraphics::clipImage(int x, int y,PGImage & img)
 		g_srcY0 = -y;
 		g_dstY0 = 0;
 	}
-	if (g_dstX1 > 13)	// here we could support arbitrary render targets if we ever need to
+	if (g_dstX1 > g_FrameBufferTarget.getWidth())	// here we could support arbitrary render targets if we ever need to
 	{
-		g_dstX1 = 13;
+		g_dstX1 = g_FrameBufferTarget.getWidth();
 	}
-	if (g_dstY1 > 13)
+	if (g_dstY1 > g_FrameBufferTarget.getHeight())
 	{
-		g_dstY1 = 13;
+		g_dstY1 = g_FrameBufferTarget.getHeight();
 	}
 }
 
@@ -616,13 +616,13 @@ void PGGraphics::drawImage2(int x, int y,PGImage & img)
         src_y0 = -y;
         dst_y0 = 0;
     }
-    if (dst_x1 > 13)
+    if (dst_x1 > g_FrameBufferTarget.getWidth())
     {
-        dst_x1 = 13;
+        dst_x1 = g_FrameBufferTarget.getWidth();
     }
-    if (dst_y1 > 13)
+    if (dst_y1 > g_FrameBufferTarget.getHeight())
     {
-        dst_y1 = 13;
+        dst_y1 = g_FrameBufferTarget.getHeight();
     }
 
     int src_y = src_y0;
@@ -636,7 +636,7 @@ void PGGraphics::drawImage2(int x, int y,PGImage & img)
             pgcolor c = PGCOLOR(src_pixel[2]>>DIM,src_pixel[1]>>DIM,src_pixel[0]>>DIM);
             if (c > 0)
             {
-                g_FrameBuffer.setPixelColor(i+j*13,c);
+                g_FrameBuffer.setPixelColor(i+j*g_FrameBufferTarget.getWidth(),c);
             }
             src_pixel+=4;
         }

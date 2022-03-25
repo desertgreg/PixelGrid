@@ -8,7 +8,11 @@
 #include "private/PGSystemSounds.h"
 #include "private/PGSystemImages.h"
 
-
+enum PGHardwareType
+{
+	HW_PIXELGRID_COLOR = 0,
+	HW_PIXELGRID_16X8,
+};
 
 //
 // PixelGrid API
@@ -17,7 +21,7 @@ class PixelGridController
 {
 public:
 	
-	void setup();
+	void setup(PGHardwareType hw = HW_PIXELGRID_COLOR,int strip_leds=0);
 	void update();
 	
 	uint32_t getFrame() { return m_frameCounter; }

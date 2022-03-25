@@ -121,6 +121,8 @@ public:
 	int getStride() { return m_Width * 4; }
 	int getPixelCount() { return m_Width * m_Height; }
 	uint8_t * getPixelAddr(int x,int y) { return &m_PixelData[x*4 + y*getStride()]; }
+	int getWidth() { return m_Width; }
+	int getHeight() { return m_Height; }
 	
 	uint16_t m_Width = 0;
 	uint16_t m_Height = 0;
