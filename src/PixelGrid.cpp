@@ -8,34 +8,37 @@ uint32_t s_LastMillis = 0;
 
 PixelGridController PixelGrid;
 PGTransition m_Transitions;
-PGHardwareType m_Hardware;
+PGHardwareType m_hardware;
 
-
-void PixelGridController::setup(PGHardwareType hw, int stripleds)
+void PixelGridController::setup(PGHardwareType hw, PixelGridOptions options)
 {
-	m_Hardware = hw;
+	m_hardware = hw;
+	m_options = options;
 	pinMode(PIN_LED,OUTPUT);
 	SerialUSB.begin(115200);
 
 	PGButtons::setup();
-	PGSounds::setup();
 	
-	int w,h,indicators;
-	switch (hw)
+	if (m_options.m_enableSound)
+	{
+		PGSounds::setup();
+	}
+	
+	switch (m_hardware)
 	{
 		case HW_PIXELGRID_16X8:
-			m_introDone = true;
-			w=16; h=8; indicators=stripleds; 
+			m_introActive = false;
+			m_width=16; m_height=8; m_indicators=m_options.m_stripLeds; 
 			break;
 		case HW_PIXELGRID_COLOR:
 		default:
-			m_introDone = false;
-			w=13; h=13;indicators=6; 
+			m_introActive = true;
+			m_width=13; m_height=13;m_indicators=6;  //6 built-in indicators, no strip connector
 			break;
 	}
-	PGGraphics::setup(w,h,indicators);
 
-
+	m_introActive &= m_options.m_enableIntro;
+	PGGraphics::setup(m_width,m_height,m_indicators);
 }
 
 
@@ -58,7 +61,7 @@ void PixelGridController::introUpdate()
 	}
 	else
 	{
-		m_introDone = true;
+		m_introActive = false;
 	}
 }
 
@@ -68,7 +71,7 @@ void PixelGridController::update()
 	PGGraphics::resetRenderStates();
 	m_frameCounter++;
 	
-	if (!m_introDone) 
+	if (m_introActive) 
 	{
 		introUpdate();
 	}
@@ -81,15 +84,18 @@ void PixelGridController::update()
 	PGSounds::update();
 	PGGraphics::update();
 
-	// Pause before next pass through loop
-	uint32_t cur = millis();
-	while (cur - s_LastMillis < 10)
-	{
-		cur = millis();
-	}; 
-	s_LastMillis = cur;
-	
 	PGGraphics::resetRenderStates();
+
+	// Pause before next pass through loop
+	if (m_options.m_pageFlipMs > 0)
+	{
+		uint32_t cur = millis();
+		while (cur - s_LastMillis < m_options.m_pageFlipMs)
+		{
+			cur = millis();
+		}; 
+		s_LastMillis = cur;
+	}
 }
 
 void PixelGridController::enableApps(bool onoff)

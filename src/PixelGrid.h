@@ -14,6 +14,14 @@ enum PGHardwareType
 	HW_PIXELGRID_16X8,
 };
 
+struct PixelGridOptions
+{
+	int m_pageFlipMs = 10;				// ms between pageflips, default 100fps
+	int m_stripLeds = 0;				// default no strip LEDs
+	bool m_enableSound = true;			// default sound enabled
+	bool m_enableIntro = true;			// default built in intro enabled (only on supported hardware)
+};
+
 //
 // PixelGrid API
 // 
@@ -21,7 +29,7 @@ class PixelGridController
 {
 public:
 	
-	void setup(PGHardwareType hw = HW_PIXELGRID_COLOR,int strip_leds=0);
+	void setup(PGHardwareType hw = HW_PIXELGRID_COLOR,PixelGridOptions options = PixelGridOptions());
 	void update();
 	
 	uint32_t getFrame() { return m_frameCounter; }
@@ -37,6 +45,9 @@ public:
 	void playSound(PGSound & sound,uint8_t channel = 0,uint8_t loop = 0);
 
 	// Graphics
+	int getScreenWidth() { return m_width; }
+	int getScreenHeight() { return m_height; }
+	int getIndicatorCount(void) { return m_indicators; }
 	void resetRenderStates();
 	void setBlendMode(PGBlendMode bm);
 	void setTint(pgcolor tint);
@@ -72,8 +83,12 @@ public:
 private:
 	void introUpdate();
 	
+	int m_width = 0;
+	int m_height = 0;
+	int m_indicators = 0;
 	bool m_appsEnabled = false;
-	bool m_introDone = false;
+	bool m_introActive = false;
+	PixelGridOptions m_options;
 	uint32_t m_frameCounter = 0;
 };
 
@@ -88,8 +103,8 @@ inline uint8_t PixelGridController::wasPressed(PGButton b) { return PGButtons::w
 inline uint8_t PixelGridController::wasReleased(PGButton b) { return PGButtons::wasReleased(b); }
 inline uint8_t PixelGridController::anyPressed() { return PGButtons::wasPressed(PGButton::U) || PGButtons::wasPressed(PGButton::D) || PGButtons::wasPressed(PGButton::L)|| PGButtons::wasPressed(PGButton::R)|| PGButtons::wasPressed(PGButton::A)|| PGButtons::wasPressed(PGButton::B); }
 
-inline void PixelGridController::setChannelVolume(uint8_t channel,uint8_t volume) { PGSounds::setChannelVolume(channel,volume); }
-inline void PixelGridController::playSound(PGSound & sound,uint8_t channel,uint8_t loop) { PGSounds::play(sound,channel,loop); }
+inline void PixelGridController::setChannelVolume(uint8_t channel,uint8_t volume) { if (m_options.m_enableSound) { PGSounds::setChannelVolume(channel,volume); } }
+inline void PixelGridController::playSound(PGSound & sound,uint8_t channel,uint8_t loop) { if (m_options.m_enableSound) { PGSounds::play(sound,channel,loop); } }
 
 inline void PixelGridController::resetRenderStates() { PGGraphics::resetRenderStates(); }
 inline void PixelGridController::setBlendMode(PGBlendMode bm) { PGGraphics::setBlendMode(bm); }

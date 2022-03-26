@@ -68,10 +68,6 @@ void PGTimerApp::update()
 	int secones = seconds;
 	
 	PixelGrid.setBlendMode(PGBlendMode::ALPHA);
-	if (!m_timing) 
-	{
-		PixelGrid.setTint(PGCOLOR(128,164,128));
-	}
 	PixelGrid.drawDigit(0,4,minutes);
 	PixelGrid.setPixel(4,5,PGCOLOR(255,255,255));
 	PixelGrid.setPixel(4,7,PGCOLOR(255,255,255));
