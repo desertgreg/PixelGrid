@@ -24,7 +24,7 @@ public:
 	static void setIndicator(int a,pgcolor color);
 	static void drawRow(int x0,int x1,int y, pgcolor color);
 	static void drawColumn(int x,int y0, int y1, pgcolor color);
-	static void drawBox(int x0,int y0, int x1,int y1, pgcolor color);
+	static void drawBox(int x0,int y0, int x1,int y1, pgcolor color,bool fill);
 	static void drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	static void drawBitmapInvert(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	static void drawImage(int x, int y,PGImage & img);

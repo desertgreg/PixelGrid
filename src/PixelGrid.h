@@ -18,6 +18,7 @@ struct PixelGridOptions
 {
 	int m_pageFlipMs = 10;				// ms between pageflips, default 100fps
 	int m_stripLeds = 0;				// default no strip LEDs
+	uint8_t m_defaultBrightness = 0x20;	// brightess multiplier 
 	bool m_enableSound = true;			// default sound enabled
 	bool m_enableIntro = true;			// default built in intro enabled (only on supported hardware)
 };
@@ -31,6 +32,7 @@ public:
 	
 	void setup(PGHardwareType hw = HW_PIXELGRID_COLOR,PixelGridOptions options = PixelGridOptions());
 	void update();
+	const PixelGridOptions & getOptions() { return m_options; }
 	
 	uint32_t getFrame() { return m_frameCounter; }
 	
@@ -59,7 +61,7 @@ public:
 	void setIndicator(int i,pgcolor color);
 	void drawRow(int x0,int x1,int y,pgcolor color);
 	void drawColumn(int x,int y0,int y1,pgcolor color);
-	void drawBox(int x0,int y0,int x1, int y1,pgcolor color);
+	void drawBox(int x0,int y0,int x1, int y1,pgcolor color,bool fill = false);
 	void drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color);
 	void drawImage(int x, int y,PGImage & pmp);
 	void drawDigit(int x, int y, int digit);
@@ -115,9 +117,8 @@ inline void PixelGridController::fill(pgcolor color) { PGGraphics::fill(color); 
 inline void PixelGridController::setPixel(int x,int y,pgcolor color) { PGGraphics::setPixel(x,y,color); }
 inline void PixelGridController::setIndicator(int i,pgcolor color) { PGGraphics::setIndicator(i,color); }
 inline void PixelGridController::drawRow(int x0,int x1,int y,pgcolor color) { PGGraphics::drawRow(x0,x1,y,color); }
-inline void PixelGridController::drawColumn(int x,int y0,int y1,pgcolor color) { PGGraphics::drawRow(x,y0,y1,color); }
-
-inline void PixelGridController::drawBox(int x0,int y0,int x1, int y1,pgcolor color) { PGGraphics::drawBox(x0,y0,x1,y1,color); }
+inline void PixelGridController::drawColumn(int x,int y0,int y1,pgcolor color) { PGGraphics::drawColumn(x,y0,y1,color); }
+inline void PixelGridController::drawBox(int x0,int y0,int x1, int y1,pgcolor color, bool fill) { PGGraphics::drawBox(x0,y0,x1,y1,color,fill); }
 inline void PixelGridController::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color) { PGGraphics::drawBitmap(x,y,bmp,color); }
 inline void PixelGridController::drawImage(int x, int y,PGImage & pmp) { PGGraphics::drawImage(x,y,pmp); }
 inline void PixelGridController::drawDigit(int x, int y, int digit) { PGGraphics::drawDigit(x,y,digit); }

@@ -181,7 +181,7 @@ public:
 		b = (uint8_t)((uint16_t)(((*src++ * g_tintB)>>8) * g_drawBrightness)>>8);
 		g = (uint8_t)((uint16_t)(((*src++ * g_tintG)>>8) * g_drawBrightness)>>8);
 		r = (uint8_t)((uint16_t)(((*src++ * g_tintR)>>8) * g_drawBrightness)>>8);
-		a = (*src++ * 0x102) >> 8;  // we need a to be 256 when we read 255 and 0 when we read 0.
+		a = *src++;  // we need a to be 256 when we read 255 and 0 when we read 0.
 		a = (a * g_tintA)>>8;
 		
 		if (a > 0)
@@ -258,7 +258,7 @@ void PGGraphics::resetRenderStates()
 {
 	g_blendMode = PGBlendMode::OPAQUE;
 	setTint(PGCOLORA(255,255,255,255));
-	setDrawBrightness(DEFAULT_DRAW_BRIGHTNESS);
+	setDrawBrightness(PixelGrid.getOptions().m_defaultBrightness);
 }
 
 void PGGraphics::setBlendMode(PGBlendMode bm)
@@ -384,16 +384,26 @@ void PGGraphics::drawColumn(int x,int y0, int y1, pgcolor color)
 	}
 }
 
-void PGGraphics::drawBox(int x0,int y0, int x1,int y1, pgcolor color)
+void PGGraphics::drawBox(int x0,int y0, int x1,int y1, pgcolor color,bool fill)
 {
 	if (x0 > x1) { uint8_t tmp = x0; x0 = x1; x1 = tmp; }
-	if (x1 - x0 > 2)
+	if (fill)
 	{
-		drawRow(x0+1,x1-1,y0,color);
-		drawRow(x0+1,x1-1,y1,color);
+		for (int x=x0; x<=x1; ++x)
+		{
+			drawColumn(x,y0,y1,color);
+		}
 	}
-	drawColumn(x0,y0,y1,color);
-	drawColumn(x1,y0,y1,color);
+	else
+	{
+		if (x1 - x0 > 2)
+		{
+			drawRow(x0+1,x1-1,y0,color);
+			drawRow(x0+1,x1-1,y1,color);
+		}
+		drawColumn(x0,y0,y1,color);
+		drawColumn(x1,y0,y1,color);
+	}
 }
 
 void PGGraphics::drawBitmap(int x, int y,PGBitmap8 & bmp,pgcolor color)
