@@ -12,6 +12,7 @@ enum PGHardwareType
 {
 	HW_PIXELGRID_COLOR = 0,
 	HW_PIXELGRID_16X8,
+	HW_PIXELGRID_20X11
 };
 
 struct PixelGridOptions
@@ -56,6 +57,7 @@ public:
 	void setBrightness(uint8_t bright);
 	
 	void clear();
+	void fade(uint8_t amount);
 	void fill(pgcolor color);
 	void setPixel(int x,int y,pgcolor color);
 	void setIndicator(int i,pgcolor color);
@@ -69,6 +71,9 @@ public:
 	
 	// Utility
 	pgcolor interpolateColors(pgcolor a, pgcolor b, uint8_t blend);
+	pgcolor randomColor();
+	float randomFloat(float min,float max);
+	int randmomInt(int min, int max);
 	
 	// Debugging
 	void print(int val);
@@ -113,6 +118,7 @@ inline void PixelGridController::setBlendMode(PGBlendMode bm) { PGGraphics::setB
 inline void PixelGridController::setTint(pgcolor tint) { PGGraphics::setTint(tint); }
 inline void PixelGridController::setBrightness(uint8_t bright) { PGGraphics::setDrawBrightness(bright); }
 inline void PixelGridController::clear() { PGGraphics::clear(); }
+inline void PixelGridController::fade(uint8_t amount) { PGGraphics::fade(amount); }
 inline void PixelGridController::fill(pgcolor color) { PGGraphics::fill(color); }
 inline void PixelGridController::setPixel(int x,int y,pgcolor color) { PGGraphics::setPixel(x,y,color); }
 inline void PixelGridController::setIndicator(int i,pgcolor color) { PGGraphics::setIndicator(i,color); }
@@ -132,6 +138,23 @@ inline pgcolor PixelGridController::interpolateColors(pgcolor c0, pgcolor c1, ui
 	uint16_t b = (((uint16_t)PGCOLOR_GETB(c0) * invblend) + ((uint16_t)PGCOLOR_GETB(c1) * blend))>>8;
 	uint16_t a = (((uint16_t)PGCOLOR_GETA(c0) * invblend) + ((uint16_t)PGCOLOR_GETA(c1) * blend))>>8;
 	return PGCOLORA(r,g,b,a);
+}
+
+inline pgcolor PixelGridController::randomColor()
+{
+	return PGCOLOR(rand()&0xff,rand()&0xff,rand()&0xff);
+}
+
+inline float PixelGridController::randomFloat(float min,float max)
+{
+	int rint = rand() & 0xfffff;
+	return (max - min) * (float)rint / 1048575.0f + min;
+}
+
+inline int PixelGridController::randmomInt(int min, int max)
+{
+	int rint = rand() & 0xffff;
+	return (max - min) * rint / 655535 + min;
 }
 
 inline void PixelGridController::print(int val)

@@ -19,6 +19,7 @@ public:
 	static void setDrawBrightness(uint8_t bright);
 	
 	static void clear();
+	static void fade(uint8_t amount);
 	static void fill(pgcolor color);
 	static void setPixel(int x,int y,pgcolor color);
 	static void setIndicator(int a,pgcolor color);

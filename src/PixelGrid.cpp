@@ -30,6 +30,10 @@ void PixelGridController::setup(PGHardwareType hw, PixelGridOptions options)
 			m_introActive = false;
 			m_width=16; m_height=8; m_indicators=m_options.m_stripLeds; 
 			break;
+		case HW_PIXELGRID_20X11:
+			m_introActive = false;
+			m_width = 20; m_height=11,m_indicators=m_options.m_stripLeds;
+			break;
 		case HW_PIXELGRID_COLOR:
 		default:
 			m_introActive = true;

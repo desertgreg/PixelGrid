@@ -1,7 +1,21 @@
 #include "PGSounds.h"
 
+
 // Enable this and attach a probe to the UART RX pin to measure the diming and duty cycle of the sound interrupt
 #define SCOPE_TIMING 01
+#define SCOPE_TIMING_PIN 6
+
+#define USE_ZEROTIMER 0
+
+#if USE_ZEROTIMER
+#define USING_TIMER_TC3 true      // Only TC3 can be used for SAMD51
+#include "SAMDTimerInterrupt.h"
+
+// Init selected SAMD timer
+SAMDTimer SoundTimer(TIMER_TC3);
+
+#endif
+
 
 
 /////////////////////////////////////////////////////
@@ -68,8 +82,12 @@ inline int16_t Update_Channel(ActiveSoundStruct & s)
 	return sample;
 }
 
-void TC5_Update()
+void Sound_Update()
 {
+#if SCOPE_TIMING
+	digitalWrite(SCOPE_TIMING_PIN,1);
+#endif
+
 	int16_t accumulator = 0;
 	
 	for (int i=0; i<SOUND_CHANNEL_COUNT; ++i)
@@ -86,15 +104,16 @@ void TC5_Update()
 	if (sample < 0) sample = 0;
 	
 	DAC->DATA.reg = (uint8_t)sample;
+	
+#if SCOPE_TIMING
+	digitalWrite(SCOPE_TIMING_PIN,0);
+#endif
+
 }
 
 // Interrupt handler for TC5
 void TC5_Handler()
 {
-#if SCOPE_TIMING
-	digitalWrite(0,1);
-#endif
-
 	//if (TC->INTFLAG.bit.MC0 == 1) {  // A compare to cc0 caused the interrupt
 	//  TC->INTFLAG.bit.MC0 = 1;    // writing a one clears the flag ovf flag
 	//}
@@ -104,11 +123,7 @@ void TC5_Handler()
 	TC->INTFLAG.bit.OVF = 1;    // writing a one clears the flag ovf flag
 	}
 
-	TC5_Update();
-
-#if SCOPE_TIMING
-	digitalWrite(0,0);
-#endif
+	Sound_Update();
 }
 
 
@@ -116,6 +131,11 @@ void PGSounds::setup()
 {
 	memset(s_DmaBuffer0,0,sizeof(s_DmaBuffer0));
 	memset(s_DmaBuffer1,0,sizeof(s_DmaBuffer1));
+
+#if USE_ZEROTIMER
+	int period = 48000000/8000;
+	SoundTimer.attachInterruptInterval_MS(1,Sound_Update);
+#else 
 	DAC->CTRLA.bit.ENABLE = 0x01;
 
 	//First configure Generic Clock(GENCTRL related Setting)
@@ -167,9 +187,9 @@ void PGSounds::setup()
 	NVIC_EnableIRQ(TC5_IRQn);
 
 	TC5->COUNT16.INTENSET.bit.OVF = 1;
-	
+#endif
 #if SCOPE_TIMING
-	pinMode(0,OUTPUT);
+	pinMode(SCOPE_TIMING_PIN,OUTPUT);
 #endif
 }
 
@@ -191,10 +211,9 @@ void PGSounds::setChannelVolume(uint8_t channel,uint8_t volume)
 
 void PGSounds::play(PGSound & sound,uint8_t channel,uint8_t loop)
 {
-	SerialUSB.print("play\r\n");
+	//SerialUSB.print("play\r\n");
 	if ((channel < 0) || (channel >= SOUND_CHANNEL_COUNT)) 
 	{
-		SerialUSB.print("a\r\n");
 		return;
 	}
 	
@@ -220,7 +239,7 @@ void PGSounds::play(PGSound & sound,uint8_t channel,uint8_t loop)
 	s_ActiveSounds[channel].m_PlaybackIncrement = s_Increments[sound.m_SampleRate];
 	s_ActiveSounds[channel].m_Active = 1;
 	
-	debug_channel(channel);
+	//debug_channel(channel);
 	
 }
 

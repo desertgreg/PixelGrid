@@ -305,6 +305,26 @@ void PGGraphics::clear()
 	}
 }
 
+void PGGraphics::fade(uint8_t amount)
+{
+	pgcolor black = PGCOLOR(0,0,0);
+	for (int j=0; j<g_FrameBufferTarget.m_Height; ++j)
+	{
+		for (int i=0; i<g_FrameBufferTarget.m_Width; ++i)
+		{
+			uint8_t* dst = g_FrameBufferTarget.getPixelAddr(i,j);
+			pgcolor* dstcolor = (pgcolor*)dst;
+			pgcolor fade = PixelGrid.interpolateColors(*dstcolor,black,amount);
+			*dstcolor = fade;
+		}
+	}
+	
+	for (int i=0; i<g_FrameBuffer.getIndicatorCount(); ++i)
+	{
+		setIndicator(i,0);
+	}
+}
+
 void PGGraphics::fill(pgcolor color)
 {
 	for (int j=0; j<g_FrameBufferTarget.m_Height; ++j)
@@ -677,17 +697,20 @@ void PGGraphics::drawDigit(int x, int y, int digit)
 void PGGraphics::drawNumber(int x,int y, int number)
 {
 	if (number < 0) number = 0;
-	if (number > 999) number = 999;
+	if (number > 9999) number = 9999;
 	
 	int tmp = number;
+	int thousands = tmp / 1000;
+	tmp -= thousands * 1000;
 	int hundreds = tmp / 100;
 	tmp -= hundreds * 100;
 	int tens = tmp / 10;
 	tmp -= tens * 10;
 	int ones = tmp;
 
-	PixelGrid.drawDigit(x,y,hundreds);
-	PixelGrid.drawDigit(x+4,y,tens);
-	PixelGrid.drawDigit(x+8,y,ones);
+	PixelGrid.drawDigit(x,y,thousands);
+	PixelGrid.drawDigit(x+4,y,hundreds);
+	PixelGrid.drawDigit(x+8,y,tens);
+	PixelGrid.drawDigit(x+12,y,ones);
 }
 

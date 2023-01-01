@@ -17,8 +17,8 @@ const int BYTES_PER_PIXEL = 3;
 const int BITS_PER_BIT = 3;
 #define FB_SIZE(numpixels) ((numpixels) * BYTES_PER_PIXEL * BITS_PER_BIT * 8 + 7)/8 + 90
 
-const int MAX_WIDTH = 16;
-const int MAX_HEIGHT = 13;
+const int MAX_WIDTH = 20;
+const int MAX_HEIGHT = 11;
 const int MAX_INDICATORS = 256; // allows for a strip leds attached to 16x8 display
 const int MAX_BACKBUFFER = MAX_WIDTH*MAX_HEIGHT + MAX_INDICATORS;
 const int MAX_FRONTBUFFER = FB_SIZE(MAX_BACKBUFFER);
